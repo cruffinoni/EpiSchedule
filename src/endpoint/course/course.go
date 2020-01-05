@@ -18,7 +18,7 @@ func isAbleToRegister(activity blueprint.CourseActivity) bool {
 		activity.RegisterProf == "1"
 }
 
-func checkAllActivitiesFromModule(env environment.Environment, course blueprint.RegisteredCourse) {
+func checkAllActivitiesFromModule(env environment.Environment, course blueprint.Course) {
 	missingOne := false
 	for _, activity := range course.Details.Activites {
 		if len(activity.Events) == 0 {
@@ -42,8 +42,8 @@ func checkAllActivitiesFromModule(env environment.Environment, course blueprint.
 				if !isAbleToRegister(activity) {
 					env.Logf(environment.VerboseSimple, "		!~ You can't register automatically to this activity because the registrations aren't open.\n		!~ You may look the appointments slots on the Epitech's intranet.\n")
 				} else {
-					env.Logf(environment.VerboseSimple, "		~ I'll register you to the activity id %v\n", activity.Codeacti)
-					RegisterUserToAnActivity(env, course, activity.Codeacti)
+					env.Logf(environment.VerboseSimple, "		~ I'll register you to the activity id %v\n", activity.ActivityCode)
+					RegisterUserToAnActivity(env, course, activity.ActivityCode)
 				}
 			}
 		} else {
@@ -56,7 +56,7 @@ func checkAllActivitiesFromModule(env environment.Environment, course blueprint.
 	}
 }
 
-func ShowNotRegisteredModuleAndActivities(env environment.Environment, courses []blueprint.RegisteredCourse) {
+func ShowNotRegisteredModuleAndActivities(env environment.Environment, courses []blueprint.Course) {
 	if env.GetVerboseLevel() < environment.VerboseSimple {
 		return
 	}
@@ -86,7 +86,7 @@ func getCourseDetails(env environment.Environment, course blueprint.CourseSummar
 	return userCourse
 }
 
-func GetAllCourses(env environment.Environment) ([]blueprint.RegisteredCourse, error) {
+func GetAllCourses(env environment.Environment) ([]blueprint.Course, error) {
 	var allCourses []blueprint.CourseSummary
 	if response, err := http.Get(endpoint.EpitechStartPoint + env.GetAuthentication() + blueprint.CourseDataEndpoint); err != nil {
 		return nil, err
@@ -95,12 +95,12 @@ func GetAllCourses(env environment.Environment) ([]blueprint.RegisteredCourse, e
 	} else if err := json.Unmarshal(body, &allCourses); err != nil {
 		return nil, err
 	}
-	userCourse := make([]blueprint.RegisteredCourse, 0)
+	userCourse := make([]blueprint.Course, 0)
 	for _, course := range allCourses {
 		if course.Semester < env.User.Semester {
 			continue
 		}
-		userCourse = append(userCourse, blueprint.RegisteredCourse{
+		userCourse = append(userCourse, blueprint.Course{
 			Summary: course,
 			Details: getCourseDetails(env, course),
 		})

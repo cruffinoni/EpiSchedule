@@ -29,7 +29,7 @@ type CourseSummary struct {
 }
 
 type CourseActivity struct {
-	Codeacti          string      `json:"codeacti"`
+	ActivityCode      string      `json:"codeacti"`
 	CallIhk           string      `json:"call_ihk"`
 	Slug              string      `json:"slug"`
 	InstanceLocation  string      `json:"instance_location"`
@@ -51,7 +51,7 @@ type CourseActivity struct {
 	RegisterProf      string      `json:"register_prof"`
 	TitleLocationType string      `json:"title_location_type"`
 	IsProjet          bool        `json:"is_projet"`
-	IDProjet          string      `json:"id_projet"`
+	ProjectId         string      `json:"id_projet"`
 	ProjectTitle      string      `json:"project_title"`
 	IsNote            bool        `json:"is_note"`
 	NbNotes           int         `json:"nb_notes"`
@@ -122,7 +122,7 @@ type CourseDetails struct {
 	Activites          []CourseActivity `json:"activites"`
 }
 
-type RegisteredCourse struct {
+type Course struct {
 	Summary CourseSummary
 	Details CourseDetails
 }
