@@ -10,6 +10,7 @@ import (
 
 func main() {
 	env := environment.NewEnvironment(3)
+	env.AddAutoRegisterActivity(environment.ActivityPitch)
 	env.SetVerboseLevel(environment.VerboseDebug)
 	if len(os.Args) != 2 {
 		log.Fatalf("Invalid args count. Wanted 1 but got %v instead.\n", len(os.Args)-1)

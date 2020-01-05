@@ -15,7 +15,17 @@ const (
 	VerboseDefault              = VerboseDebug
 )
 
+var verboseLevelName = map[VerboseLevel]string{
+	VerboseNone:   "None",
+	VerboseSimple: "Simple",
+	VerboseMedium: "Medium",
+	VerboseDebug:  "Debug",
+}
+
 func (env Environment) SetVerboseLevel(level VerboseLevel) {
+	if verboseLevelName[level] == "" {
+		return
+	}
 	env.verbose = level
 }
 
