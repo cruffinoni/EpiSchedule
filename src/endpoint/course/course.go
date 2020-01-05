@@ -9,8 +9,6 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
-	"time"
-	//"time"
 )
 
 func isAbleToRegister(activity blueprint.CourseActivity) bool {
@@ -20,14 +18,12 @@ func isAbleToRegister(activity blueprint.CourseActivity) bool {
 
 func checkAllActivitiesFromModule(env environment.Environment, course blueprint.Course) {
 	missingOne := false
-	for _, activity := range course.Details.Activites {
+	for _, activity := range course.Details.Activities {
 		if len(activity.Events) == 0 {
-			if activity.TypeTitle == "Project" {
-				env.Logf(environment.VerboseSimple, "	!< You are not registered to the project [%v] ! You may register it as soon as possible. The project start at %v.\n",
+			if activity.TypeTitle == "Project" && endpoint.IsDateBeforeNow(activity.End) {
+				env.Logf(environment.VerboseSimple, "	!< You are not registered to the main project (named '%v') ! You may register it as soon as possible. The project start at %v.\n",
 					activity.Title, activity.Begin)
-			} else if startActive, err := endpoint.GetDateFromString(activity.Begin); err != nil {
-				log.Fatalf("Unable to retrieve date from string inside (ShowNotRegisteredActivities): %v\n", err.Error())
-			} else if time.Now().Before(startActive) && (activity.EndRegister == "" || !isAbleToRegister(activity)) {
+			} else if endpoint.IsDateBeforeNow(activity.Begin) && (activity.EndRegister == "" || !isAbleToRegister(activity)) {
 				env.Logf(environment.VerboseSimple, "	!- You are not registered to [%v] but the activity begin to be active at %v. You will be able to register as of this date.\n",
 					activity.Title, activity.Begin)
 			} else {

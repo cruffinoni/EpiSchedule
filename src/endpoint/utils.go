@@ -1,6 +1,7 @@
 package endpoint
 
 import (
+	"log"
 	"time"
 )
 
@@ -15,6 +16,19 @@ func GetDateFromString(strDate string) (time.Time, error) {
 	} else {
 		return date, err
 	}
+}
+
+func IsDateAfterNow(date string) bool {
+	if dateTime, err := GetDateFromString(date); err != nil {
+		log.Fatalf("Unable to retrieve date from string '%v'. Err: %v\n", date, err.Error())
+	} else {
+		return time.Now().After(dateTime)
+	}
+	return false
+}
+
+func IsDateBeforeNow(date string) bool {
+	return !IsDateAfterNow(date)
 }
 
 /*

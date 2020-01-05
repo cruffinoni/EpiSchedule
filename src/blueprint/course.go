@@ -119,7 +119,7 @@ type CourseDetails struct {
 	Color              string           `json:"color"`
 	StudentFlags       string           `json:"student_flags"`
 	CurrentResp        bool             `json:"current_resp"`
-	Activites          []CourseActivity `json:"activites"`
+	Activities         []CourseActivity `json:"activites"`
 }
 
 type Course struct {

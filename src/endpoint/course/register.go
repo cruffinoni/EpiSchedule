@@ -12,7 +12,7 @@ import (
 )
 
 func RegisterUserToAnActivity(env environment.Environment, course blueprint.Course, activityId string) {
-	for _, activity := range course.Details.Activites {
+	for _, activity := range course.Details.Activities {
 		if activity.ActivityCode != activityId {
 			continue
 		}

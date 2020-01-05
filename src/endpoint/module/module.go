@@ -71,7 +71,7 @@ func NewModulesBoard(env environment.Environment, start, end time.Time) ([]Modul
 }
 
 /*
-	https://intra.epitech.eu/module/2019/B-SHL-300/STG-3-1/register?format=json
+
 	endpoint := EpitechStartPoint + user.GetAuthentication() + fmt.Sprintf("/module/2019/%v/%v/acti-376004/event-368655/unregister?format=json", module.ModuleCode, module.Codeinstance)
 	req, err := http.NewRequest("POST", endpoint, bytes.NewBuffer([]byte("{}")))
 	if err != nil {
