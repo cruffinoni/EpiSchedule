@@ -1,9 +1,9 @@
 package environment
 
 import (
-	"blueprint"
 	"encoding/json"
 	"fmt"
+	"github.com/Dayrion/EpiSchedule/src/blueprint"
 	"golang.org/x/net/context"
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/google"
@@ -13,6 +13,7 @@ import (
 	"log"
 	"os"
 	"runtime"
+	"strings"
 	"time"
 )
 
@@ -20,6 +21,12 @@ const (
 	EpiScheduleCalendarName = "Epitech Schedule"
 	defaultTimeZone         = "Europe/Paris"
 )
+
+type GoogleCalendar struct {
+	service          *calendar.Service
+	internalCalendar *calendar.Calendar
+	registeredEvents map[string]int
+}
 
 // Request a token from the web, then returns the retrieved token.
 func getTokenFromWeb(config *oauth2.Config) *oauth2.Token {
@@ -197,35 +204,42 @@ func dateToRFC3339(strDate string) string {
 	return ""
 }
 
-func (env Environment) AddEvent(title, description, typeTitle, begin, end string) {
-	if env.googleCalendar.registeredEvents[title] > 0 {
-		env.Logf(VerboseSimple, "	> The event '%v' is already registered in the calendar.\n", title)
+func (env Environment) AddEvent(activity blueprint.CourseActivity) {
+	if env.googleCalendar.registeredEvents[activity.Title] > 0 {
+		env.Logf(VerboseSimple, "	> The event '%v' is already registered in the calendar.\n", activity.Title)
 		return
+	}
+	extractedLocation := strings.Split(activity.Events[0].Location, "/")
+	locationName := ""
+	if extractedLocation[len(extractedLocation)-1] != "" {
+		locationName = strings.Replace(extractedLocation[len(extractedLocation)-1], "-", " ", -1)
+	} else {
+		locationName = "N/A"
 	}
 	_, err := env.googleCalendar.service.Events.Insert(env.googleCalendar.internalCalendar.Id,
 		&calendar.Event{
 			AnyoneCanAddSelf: false,
-			ColorId:          activityColor[typeTitle],
-			Description:      description,
+			ColorId:          activityColor[activity.TypeTitle],
+			Description:      activity.Description,
 			End: &calendar.EventDateTime{
-				DateTime: dateToRFC3339(end),
+				DateTime: dateToRFC3339(activity.Events[0].End),
 				TimeZone: defaultTimeZone,
 			},
 			Kind:     "calendar#event",
-			Location: "Epitech, Strasbourg, France",
+			Location: locationName,
 			Start: &calendar.EventDateTime{
-				DateTime: dateToRFC3339(begin),
+				DateTime: dateToRFC3339(activity.Events[0].Begin),
 				TimeZone: defaultTimeZone,
 			},
 			Status:       "confirmed",
-			Summary:      title,
+			Summary:      activity.Title,
 			Transparency: "opaque",
 			Visibility:   "private",
 		}).Do()
 	if err != nil {
 		log.Fatalf("Unable to insert an event: '%v'\n", err.Error())
 	}
-	env.googleCalendar.registeredEvents[title]++
+	env.googleCalendar.registeredEvents[activity.Title]++
 	env.Log(VerboseSimple, "	> Activity successfully added.\n")
 
 }

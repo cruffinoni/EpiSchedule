@@ -1,9 +1,9 @@
 package planning
 
 import (
-	"blueprint"
-	"endpoint"
-	"environment"
+	"github.com/Dayrion/EpiSchedule/src/blueprint"
+	"github.com/Dayrion/EpiSchedule/src/endpoint"
+	"github.com/Dayrion/EpiSchedule/src/environment"
 )
 
 func ShowIncomingEvents(env environment.Environment, courseList []blueprint.Course) {
@@ -34,7 +34,7 @@ func ShowIncomingEvents(env environment.Environment, courseList []blueprint.Cour
 					activity.Title, course.Summary.Title)
 				if env.IsAutoCalendarRegisteredActivity(activity.TypeTitle) {
 					env.Log(environment.VerboseSimple, "	> This activity will be added to your agenda.\n")
-					env.AddEvent(activity.Title, activity.Description, activity.TypeTitle, activity.Events[0].Begin, activity.Events[0].End)
+					env.AddEvent(activity)
 				}
 				env.Logf(environment.VerboseSimple, "		- The event start at %v and end at %v\n",
 					activity.Events[0].Begin, activity.Events[0].End)

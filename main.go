@@ -1,31 +1,35 @@
 package main
 
 import (
-	"endpoint/course"
-	"endpoint/planning"
-	"environment"
+	"github.com/Dayrion/EpiSchedule/src/credits"
+	"github.com/Dayrion/EpiSchedule/src/endpoint/course"
+	"github.com/Dayrion/EpiSchedule/src/endpoint/planning"
+	"github.com/Dayrion/EpiSchedule/src/endpoint/reception"
+	"github.com/Dayrion/EpiSchedule/src/environment"
+	"github.com/Dayrion/EpiSchedule/src/introspect"
 	"log"
 	"os"
 )
 
 func main() {
-	env := environment.NewEnvironment(3)
+	environment.CheckArgs(os.Args)
+	env := environment.NewEnvironment()
 	env.SetVerboseLevel(environment.VerboseDebug)
-	if len(os.Args) != 2 {
-		log.Fatalf("Invalid args count. Wanted 1 but got %v instead.\n", len(os.Args)-1)
-	}
+	env.RetrieveCommandFlag(os.Args)
+	env.User.Semester, env.User.Credits = reception.GetCurrentUserSemesterAndCredits(env)
+	credits.DisplayCreditsInfo(env)
 	allCourses, err := course.GetAllCourses(env)
 	if err != nil {
 		log.Fatalf("An error occured during retrieving all courses: %v\n", err.Error())
 	}
-	if os.Args[1] == "register" {
-		env.AddAutoRegisterActivity(environment.ActivityPitch, environment.ActivityKickOff, environment.ActivityProjectTime, environment.ActivityTP)
+	if os.Args[1] == environment.FlagRegister {
+		env.AddAutoRegisterActivity(environment.ActivityKickOff, environment.ActivityProjectTime)
 		course.ShowNotRegisteredModuleAndActivities(env, allCourses)
-	} else if os.Args[1] == "show" {
+	} else if os.Args[1] == environment.FlagShow {
 		env.SetUpCalendar()
 		env.AddAutoRegisterCalendarActivity(environment.ActivityPitch, environment.ActivityKickOff, environment.ActivityProjectTime, environment.ActivityTP)
 		planning.ShowIncomingEvents(env, allCourses)
-	} else {
-		log.Fatalf("'%v' is an invalid arg\n", os.Args[1])
+	} else if os.Args[1] == environment.FlagIntrospect {
+		introspect.ListAllActivityFromCourses(allCourses)
 	}
 }

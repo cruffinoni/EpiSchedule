@@ -1,11 +1,11 @@
 package course
 
 import (
-	"blueprint"
 	"bytes"
-	"endpoint"
-	"environment"
 	"fmt"
+	"github.com/Dayrion/EpiSchedule/src/blueprint"
+	"github.com/Dayrion/EpiSchedule/src/endpoint"
+	"github.com/Dayrion/EpiSchedule/src/environment"
 	"io/ioutil"
 	"log"
 	"net/http"

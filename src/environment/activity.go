@@ -10,6 +10,11 @@ const (
 	ActivityTP          = "TP"
 	ActivityKickOff     = "Kick-off"
 	ActivityProjectTime = "Project time"
+	ActivityBTTF        = "BTTF"
+	ActivityMiniProject = "Mini-Project"
+	ActivityTEpitech    = "TEPitech"
+	ActivityFollowUp    = "Follow-up"
+	ActivityEvent       = "Envent"
 
 	/*
 	   1 -> #a4bdfc
@@ -25,7 +30,7 @@ const (
 	   11 -> #dc2127
 	   Source: Google Colors from Google Calendar API, Colors part
 	*/
-	activityColorConference  = "10"
+	activityColorConference  = "1"
 	activityColorDefense     = "2"
 	activityColorDelivery    = "3"
 	activityColorPitch       = "4"
@@ -34,6 +39,11 @@ const (
 	activityColorTP          = "7"
 	activityColorKickOff     = "8"
 	activityColorProjectTime = "9"
+	activityColorBTTF        = "10"
+	activityColorMiniProject = "11"
+	activityColorTEpitech    = "1"
+	activityColorFollowUp    = "2"
+	activityColorEvent       = "3"
 )
 
 var activityColor = map[string]string{
@@ -46,6 +56,11 @@ var activityColor = map[string]string{
 	ActivityTP:          activityColorTP,
 	ActivityKickOff:     activityColorKickOff,
 	ActivityProjectTime: activityColorProjectTime,
+	ActivityBTTF:        activityColorBTTF,
+	ActivityMiniProject: activityColorMiniProject,
+	ActivityTEpitech:    activityColorTEpitech,
+	ActivityFollowUp:    activityColorFollowUp,
+	ActivityEvent:       activityColorEvent,
 }
 
 func isElementPresent(reference []string, element string) bool {

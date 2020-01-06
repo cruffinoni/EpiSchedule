@@ -2,9 +2,9 @@ package module
 
 import (
 	"encoding/json"
-	"endpoint"
-	"environment"
 	"fmt"
+	"github.com/Dayrion/EpiSchedule/src/endpoint"
+	"github.com/Dayrion/EpiSchedule/src/environment"
 	"io/ioutil"
 	"log"
 	"net/http"

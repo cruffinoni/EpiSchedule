@@ -2,7 +2,7 @@ package module
 
 import (
 	"fmt"
-	"github.com/EpiSchedule/src/endpoint"
+	"github.com/Dayrion/EpiSchedule/src/endpoint"
 	"log"
 	"time"
 )

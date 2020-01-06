@@ -109,7 +109,7 @@ type CourseDetails struct {
 	OldACLBackup       string           `json:"old_acl_backup"`
 	Resp               []StaffData      `json:"resp"`
 	Assistant          []StaffData      `json:"assistant"`
-	Rights             string           `json:"rights"`
+	Rights             []string         `json:"rights"`
 	TemplateResp       []StaffData      `json:"template_resp"`
 	AllowRegister      int              `json:"allow_register"`
 	DateIns            string           `json:"date_ins"`

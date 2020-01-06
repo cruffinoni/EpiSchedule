@@ -3,19 +3,18 @@ package environment
 import (
 	"context"
 	"fmt"
-	"google.golang.org/api/calendar/v3"
+	"github.com/Dayrion/EpiSchedule/src/blueprint"
 	"log"
 	"net/http"
 )
 
+const (
+	ProjectName = "EpiSchedule"
+)
+
 type UserData struct {
 	Semester int
-}
-
-type GoogleCalendar struct {
-	service          *calendar.Service
-	internalCalendar *calendar.Calendar
-	registeredEvents map[string]int
+	Credits  blueprint.Credits
 }
 
 type Environment struct {
@@ -27,9 +26,10 @@ type Environment struct {
 	autoAddCalendar []string
 	googleCalendar  *GoogleCalendar
 	ctx             context.Context
+	Flag            Flag
 }
 
-func NewEnvironment(semester int) Environment {
+func NewEnvironment() Environment {
 	fmt.Print("Program initialization...\n")
 	authentication := GetAuthLoginLinkFromEnv()
 	if authentication == "" {
@@ -39,7 +39,7 @@ func NewEnvironment(semester int) Environment {
 		authentication: authentication,
 		Client:         http.DefaultClient,
 		User: UserData{
-			Semester: semester,
+			Semester: 0,
 		},
 		verbose:        VerboseDefault,
 		googleCalendar: nil,

@@ -1,11 +1,11 @@
 package course
 
 import (
-	"blueprint"
 	"encoding/json"
-	"endpoint"
-	"environment"
 	"fmt"
+	"github.com/Dayrion/EpiSchedule/src/blueprint"
+	"github.com/Dayrion/EpiSchedule/src/endpoint"
+	"github.com/Dayrion/EpiSchedule/src/environment"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -64,8 +64,8 @@ func ShowNotRegisteredModuleAndActivities(env environment.Environment, courses [
 			env.Logf(environment.VerboseSimple, "! You seems not to be registered to the module: %v\n", course.Details.Title)
 		} else {
 			env.Logf(environment.VerboseSimple, "+ You are registered to the module: %v\n", course.Details.Title)
+			checkAllActivitiesFromModule(env, course)
 		}
-		checkAllActivitiesFromModule(env, course)
 	}
 }
 
@@ -93,7 +93,7 @@ func GetAllCourses(env environment.Environment) ([]blueprint.Course, error) {
 	}
 	userCourse := make([]blueprint.Course, 0)
 	for _, course := range allCourses {
-		if course.Semester < env.User.Semester {
+		if course.Semester < env.User.Semester && (env.User.Semester != 0 && !env.Flag.SpecialSemester) {
 			continue
 		}
 		userCourse = append(userCourse, blueprint.Course{
