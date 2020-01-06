@@ -12,16 +12,21 @@ type UserData struct {
 	Semester int
 }
 
-type Environment struct {
-	authentication   string
-	Client           *http.Client
-	User             UserData
-	verbose          VerboseLevel
-	autoRegister     []string
-	autoAddCalendar  []string
-	calendarService  *calendar.Service
+type GoogleCalendar struct {
+	service          *calendar.Service
 	internalCalendar *calendar.Calendar
-	ctx              context.Context
+	registeredEvents map[string]int
+}
+
+type Environment struct {
+	authentication  string
+	Client          *http.Client
+	User            UserData
+	verbose         VerboseLevel
+	autoRegister    []string
+	autoAddCalendar []string
+	googleCalendar  *GoogleCalendar
+	ctx             context.Context
 }
 
 func NewEnvironment(semester int) Environment {
@@ -36,14 +41,20 @@ func NewEnvironment(semester int) Environment {
 		User: UserData{
 			Semester: semester,
 		},
-		verbose:         VerboseDefault,
-		calendarService: nil,
-		ctx:             context.Background(),
+		verbose:        VerboseDefault,
+		googleCalendar: nil,
+		ctx:            context.Background(),
 	}
 	testConnection(env)
-	env.createCalendarService()
-	env.retrieveCalendar()
-	//env.listCalendarEvents()
 	fmt.Print("Initialization done...\n")
 	return env
+}
+
+func (env *Environment) SetUpCalendar() {
+	if env.googleCalendar != nil {
+		return
+	}
+	env.createCalendarService()
+	env.retrieveCalendar()
+	env.listRegisteredEvents()
 }

@@ -32,7 +32,11 @@ func ShowIncomingEvents(env environment.Environment, courseList []blueprint.Cour
 				}
 				env.Logf(environment.VerboseSimple, "	+ You are registered to the activity [%v] coming from '%v'.\n",
 					activity.Title, course.Summary.Title)
-				env.Logf(environment.VerboseSimple, "		- The even start at %v and end at %v\n",
+				if env.IsAutoCalendarRegisteredActivity(activity.TypeTitle) {
+					env.Log(environment.VerboseSimple, "	> This activity will be added to your agenda.\n")
+					env.AddEvent(activity.Title, activity.Description, activity.TypeTitle, activity.Events[0].Begin, activity.Events[0].End)
+				}
+				env.Logf(environment.VerboseSimple, "		- The event start at %v and end at %v\n",
 					activity.Events[0].Begin, activity.Events[0].End)
 			}
 		}
