@@ -216,10 +216,16 @@ func (env Environment) AddEvent(activity blueprint.CourseActivity) {
 	} else {
 		locationName = "N/A"
 	}
+	color := "1"
+	if activityColor[activity.TypeTitle] != "" {
+		color = activityColor[activity.TypeTitle]
+	} else {
+		env.Errorf("Activity named '%v' is unknown to %v. Back to the default color.\n", activity.TypeTitle, ProjectName)
+	}
 	_, err := env.googleCalendar.service.Events.Insert(env.googleCalendar.internalCalendar.Id,
 		&calendar.Event{
 			AnyoneCanAddSelf: false,
-			ColorId:          activityColor[activity.TypeTitle],
+			ColorId:          color,
 			Description:      activity.Description,
 			End: &calendar.EventDateTime{
 				DateTime: dateToRFC3339(activity.Events[0].End),

@@ -21,34 +21,34 @@ func checkAllActivitiesFromModule(env environment.Environment, course blueprint.
 	for _, activity := range course.Details.Activities {
 		if len(activity.Events) == 0 {
 			if activity.TypeTitle == "Project" && endpoint.IsDateBeforeNow(activity.End) {
-				env.Logf(environment.VerboseSimple, "	!< You are not registered to the main project (named '%v') ! You may register it as soon as possible. The project start at %v.\n",
+				env.Logf(environment.VerboseSimple, environment.ColorMagenta+"	!< You are not registered to the main project (named '%v') ! You may register it as soon as possible. The project start at %v.\n",
 					activity.Title, activity.Begin)
 			} else if endpoint.IsDateBeforeNow(activity.Begin) && (activity.EndRegister == "" || !isAbleToRegister(activity)) {
-				env.Logf(environment.VerboseSimple, "	!- You are not registered to [%v] but the activity begin to be active at %v. You will be able to register as of this date.\n",
+				env.Logf(environment.VerboseSimple, environment.ColorBrightYellow+"	!- You are not registered to [%v] but the activity begin to be active at %v. You will be able to register as of this date.\n",
 					activity.Title, activity.Begin)
 			} else {
-				env.Logf(environment.VerboseDebug, "	~ [%v] might be already passed out or the data is unrecognizable. The activity started at %v\n",
+				env.Logf(environment.VerboseDebug, environment.ColorBlue+"	~ [%v] might be already passed out or the data is unrecognizable. The activity started at %v\n",
 					activity.Title, activity.Begin)
 			}
 		} else if activity.Events[0].AlreadyRegister == "" {
 			missingOne = true
-			env.Logf(environment.VerboseSimple, "	!! You are not registered to [%v] which is: [%v]\n",
+			env.Logf(environment.VerboseSimple, environment.ColorRed+"	!! You are not registered to [%v] which is: [%v]\n",
 				activity.Title, activity.TypeTitle)
 			if env.IsAutoRegisteredActivity(activity.TypeTitle) {
 				if !isAbleToRegister(activity) {
-					env.Logf(environment.VerboseSimple, "		!~ You can't register automatically to this activity because the registrations aren't open.\n		!~ You may look the appointments slots on the Epitech's intranet.\n")
+					env.Logf(environment.VerboseSimple, environment.ColorRed+"		!~ You can't register automatically to this activity because the registrations aren't open.\n		!~ You may look the appointments slots on the Epitech's intranet.\n")
 				} else {
 					env.Logf(environment.VerboseSimple, "		~ I'll register you to the activity id %v\n", activity.ActivityCode)
 					RegisterUserToAnActivity(env, course, activity.ActivityCode)
 				}
 			}
 		} else {
-			env.Logf(environment.VerboseMedium, "	++ You are registered to [%v] typed as [%v]\n",
+			env.Logf(environment.VerboseMedium, environment.ColorGreen+"	++ You are registered to [%v] typed as [%v]\n",
 				activity.Title, activity.TypeTitle)
 		}
 	}
 	if !missingOne {
-		env.Logf(environment.VerboseSimple, "	+ You are registered to all activities for this module.\n")
+		env.Logf(environment.VerboseSimple, environment.ColorCyan+"	+ You are registered to all activities for this module.\n")
 	}
 }
 

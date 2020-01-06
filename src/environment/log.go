@@ -35,13 +35,14 @@ func (env Environment) GetVerboseLevel() VerboseLevel {
 
 func (env Environment) Logf(level VerboseLevel, msg string, format ...interface{}) {
 	if env.verbose >= level {
-		fmt.Printf(msg, format...)
+		fmt.Printf(msg+ColorReset, format...)
 	}
 }
 
 func (env Environment) Log(level VerboseLevel, msg ...interface{}) {
 	if env.verbose >= level {
 		fmt.Print(msg...)
+		fmt.Print(ColorReset)
 	}
 }
 
