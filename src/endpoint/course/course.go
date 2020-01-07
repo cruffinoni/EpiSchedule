@@ -12,8 +12,10 @@ import (
 )
 
 func isAbleToRegister(activity blueprint.CourseActivity) bool {
-	return activity.Register == "1" || activity.RegisterByBloc == "1" ||
-		activity.RegisterProf == "1"
+	return (activity.Register == "1" || activity.RegisterByBloc == "1" ||
+		activity.RegisterProf == "1") &&
+		(len(activity.Events) > 0 &&
+			(activity.Events[0].NbMaxStudentsProjet != "" || activity.Events[0].Location != ""))
 }
 
 func checkAllActivitiesFromModule(env environment.Environment, course blueprint.Course) {
@@ -36,7 +38,8 @@ func checkAllActivitiesFromModule(env environment.Environment, course blueprint.
 				activity.Title, activity.TypeTitle)
 			if env.IsAutoRegisteredActivity(activity.TypeTitle) {
 				if !isAbleToRegister(activity) {
-					env.Logf(environment.VerboseSimple, environment.ColorRed+"		!~ You can't register automatically to this activity because the registrations aren't open.\n		!~ You may look the appointments slots on the Epitech's intranet.\n")
+					env.Logf(environment.VerboseSimple, environment.ColorRed+"		!~ You can't register automatically to this activity because the registrations aren't open: room undefined nor no maximum seats specified nor registrations closed.\n"+
+						"		!~ You may look the appointments slots on the Epitech's intranet.\n")
 				} else {
 					env.Logf(environment.VerboseSimple, "		~ I'll register you to the activity id %v\n", activity.ActivityCode)
 					RegisterUserToAnActivity(env, course, activity.ActivityCode)
