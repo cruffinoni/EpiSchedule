@@ -3,6 +3,7 @@ package blueprint
 const (
 	CourseDataEndpoint    = "/course/filter?format=json&location[]=FR&location[]=FR%2FSTG&course[]=bachelor%2Fclassic&scolaryear[]=2019"
 	CourseDetailsEndpoint = "/module/%v/%v/%v/?format=json"
+	EpitechStartPoint     = "https://intra.epitech.eu/"
 )
 
 type CourseSummary struct {

@@ -8,15 +8,13 @@ import (
 type VerboseLevel uint
 
 const (
-	VerboseNone    VerboseLevel = iota
-	VerboseSimple               = VerboseNone + 1
-	VerboseMedium               = VerboseSimple + 1
-	VerboseDebug                = VerboseMedium + 1
-	VerboseDefault              = VerboseDebug
+	VerboseSimple  = iota + 1
+	VerboseMedium  = VerboseSimple + 1
+	VerboseDebug   = VerboseMedium + 1
+	VerboseDefault = VerboseDebug
 )
 
 var verboseLevelName = map[VerboseLevel]string{
-	VerboseNone:   "None",
 	VerboseSimple: "Simple",
 	VerboseMedium: "Medium",
 	VerboseDebug:  "Debug",

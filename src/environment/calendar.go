@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/Dayrion/EpiSchedule/src/blueprint"
-	"golang.org/x/net/context"
+	"github.com/Dayrion/EpiSchedule/src/utils"
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/google"
 	"google.golang.org/api/calendar/v3"
@@ -12,6 +12,7 @@ import (
 	"io/ioutil"
 	"log"
 	"os"
+	"os/exec"
 	"runtime"
 	"strings"
 	"time"
@@ -20,6 +21,7 @@ import (
 const (
 	EpiScheduleCalendarName = "Epitech Schedule"
 	defaultTimeZone         = "Europe/Paris"
+	googleFolder            = "./google/"
 )
 
 type GoogleCalendar struct {
@@ -29,17 +31,34 @@ type GoogleCalendar struct {
 }
 
 // Request a token from the web, then returns the retrieved token.
-func getTokenFromWeb(config *oauth2.Config) *oauth2.Token {
+func getTokenFromWeb(env Environment, config *oauth2.Config) *oauth2.Token {
 	authURL := config.AuthCodeURL("state-token", oauth2.AccessTypeOffline)
-	fmt.Printf("Go to the following link in your browser then type the "+
-		"authorization code: \n%v\n", authURL)
+
+	env.Log(VerboseSimple, ColorYellow+"! To access your to calendar, "+ProjectName+" needs your authorization. "+
+		"A link to Google will open allowing you to connect, securely, to it.\n"+
+		"Once connected, enter the authorization code: \n")
+	time.Sleep(time.Second * 5)
+	var err error
+	switch runtime.GOOS {
+	case "linux":
+		err = exec.Command("xdg-open", authURL).Start()
+	case "windows":
+		err = exec.Command("rundll32", "url.dll,FileProtocolHandler", authURL).Start()
+	case "darwin":
+		err = exec.Command("open", authURL).Start()
+	default:
+		err = fmt.Errorf("unsupported platform")
+	}
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	var authCode string
 	if _, err := fmt.Scan(&authCode); err != nil {
 		log.Fatalf("Unable to read authorization code: %v", err)
 	}
 
-	tok, err := config.Exchange(context.TODO(), authCode)
+	tok, err := config.Exchange(env.ctx, authCode)
 	if err != nil {
 		log.Fatalf("Unable to retrieve token from web: %v", err)
 	}
@@ -70,48 +89,24 @@ func saveToken(path string, token *oauth2.Token) {
 }
 
 // Retrieve a token, saves the token, then returns the generated client.
-func refreshToken(config *oauth2.Config) *oauth2.Token {
+func refreshToken(env Environment, config *oauth2.Config) *oauth2.Token {
 	// The file token.json stores the user's access and refresh tokens, and is
 	// created automatically when the authorization flow completes for the first
 	// time.
-	tokFile := getGoogleFolder() + "token.json"
+	tokFile := googleFolder + "token.json"
 	token, err := tokenFromFile(tokFile)
 	if err != nil {
-		token = getTokenFromWeb(config)
+		token = getTokenFromWeb(env, config)
 		saveToken(tokFile, token)
 	}
 	return token
-}
-
-func getGoogleFolder() string {
-	switch osName := runtime.GOOS; osName {
-	case "windows":
-		{
-			if home := os.Getenv("USERPROFILE"); home == "" {
-				log.Fatal("Unable to retrieve home path from env variable.\n")
-			} else {
-				return home + "\\.google\\"
-			}
-		}
-	case "linux":
-		{
-			if home := os.Getenv("HOME"); home == "" {
-				log.Fatal("Unable to retrieve home path from env variable.\n")
-			} else {
-				return home + "/.google/"
-			}
-		}
-	default:
-		log.Fatal("Unknown OS or not supported by EpiShedule\n")
-	}
-	return ""
 }
 
 func (env *Environment) createCalendarService() {
 	env.googleCalendar = &GoogleCalendar{
 		registeredEvents: make(map[string]int),
 	}
-	credFile, err := ioutil.ReadFile(getGoogleFolder() + "credentials.json")
+	credFile, err := ioutil.ReadFile(googleFolder + "credentials.json")
 	if err != nil {
 		log.Fatalf("Unable to read client secret file: %v", err)
 	}
@@ -119,7 +114,7 @@ func (env *Environment) createCalendarService() {
 	if err != nil {
 		log.Fatalf("Unable to parse client secret file to config: %v", err)
 	}
-	token := refreshToken(config)
+	token := refreshToken(*env, config)
 	calendarService, err := calendar.NewService(env.ctx, option.WithTokenSource(config.TokenSource(env.ctx, token)))
 	if err != nil {
 		log.Fatalf("Unable to retrieve Calendar client: %v", err)
@@ -193,20 +188,9 @@ func (env *Environment) listRegisteredEvents() {
 	}
 }
 
-func dateToRFC3339(strDate string) string {
-	const layout = "2006-01-02 15:04:05 -0700 UTC"
-	strDate = strDate + " +0100 UTC"
-	if date, err := time.Parse(layout, strDate); err != nil {
-		log.Fatal("Unable to parse a date.\n")
-	} else {
-		return date.Format(time.RFC3339)
-	}
-	return ""
-}
-
 func (env Environment) AddEvent(activity blueprint.CourseActivity) {
 	if env.googleCalendar.registeredEvents[activity.Title] > 0 {
-		env.Logf(VerboseSimple, "	> The event '%v' is already registered in the calendar.\n", activity.Title)
+		env.Logf(VerboseSimple, ColorMagenta+"	> The event '%v' is already registered in the calendar.\n", activity.Title)
 		return
 	}
 	extractedLocation := strings.Split(activity.Events[0].Location, "/")
@@ -216,10 +200,9 @@ func (env Environment) AddEvent(activity blueprint.CourseActivity) {
 	} else {
 		locationName = "N/A"
 	}
-	color := "1"
-	if activityColor[activity.TypeTitle] != "" {
-		color = activityColor[activity.TypeTitle]
-	} else {
+	color := activityColor[activity.TypeTitle]
+	if activityColor[activity.TypeTitle] == "" {
+		color = "1"
 		env.Errorf("Activity named '%v' is unknown to %v. Back to the default color.\n", activity.TypeTitle, ProjectName)
 	}
 	_, err := env.googleCalendar.service.Events.Insert(env.googleCalendar.internalCalendar.Id,
@@ -228,13 +211,13 @@ func (env Environment) AddEvent(activity blueprint.CourseActivity) {
 			ColorId:          color,
 			Description:      activity.Description,
 			End: &calendar.EventDateTime{
-				DateTime: dateToRFC3339(activity.Events[0].End),
+				DateTime: utils.DateToRFC3339(activity.Events[0].End),
 				TimeZone: defaultTimeZone,
 			},
 			Kind:     "calendar#event",
 			Location: locationName,
 			Start: &calendar.EventDateTime{
-				DateTime: dateToRFC3339(activity.Events[0].Begin),
+				DateTime: utils.DateToRFC3339(activity.Events[0].Begin),
 				TimeZone: defaultTimeZone,
 			},
 			Status:       "confirmed",
@@ -246,6 +229,6 @@ func (env Environment) AddEvent(activity blueprint.CourseActivity) {
 		log.Fatalf("Unable to insert an event: '%v'\n", err.Error())
 	}
 	env.googleCalendar.registeredEvents[activity.Title]++
-	env.Log(VerboseSimple, "	> Activity successfully added.\n")
+	env.Log(VerboseSimple, ColorBlue+"	> Activity successfully added.\n")
 
 }

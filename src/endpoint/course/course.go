@@ -4,8 +4,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/Dayrion/EpiSchedule/src/blueprint"
-	"github.com/Dayrion/EpiSchedule/src/endpoint"
 	"github.com/Dayrion/EpiSchedule/src/environment"
+	"github.com/Dayrion/EpiSchedule/src/utils"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -22,10 +22,10 @@ func checkAllActivitiesFromModule(env environment.Environment, course blueprint.
 	missingOne := false
 	for _, activity := range course.Details.Activities {
 		if len(activity.Events) == 0 {
-			if activity.TypeTitle == "Project" && endpoint.IsDateBeforeNow(activity.End) {
+			if activity.TypeTitle == "Project" && utils.IsDateBeforeNow(activity.End) {
 				env.Logf(environment.VerboseSimple, environment.ColorMagenta+"	!< You are not registered to the main project (named '%v') ! You may register it as soon as possible. The project start at %v.\n",
 					activity.Title, activity.Begin)
-			} else if endpoint.IsDateBeforeNow(activity.Begin) && (activity.EndRegister == "" || !isAbleToRegister(activity)) {
+			} else if utils.IsDateBeforeNow(activity.Begin) && (activity.EndRegister == "" || !isAbleToRegister(activity)) {
 				env.Logf(environment.VerboseSimple, environment.ColorBrightYellow+"	!- You are not registered to [%v] but the activity begin to be active at %v. You will be able to register as of this date.\n",
 					activity.Title, activity.Begin)
 			} else {
@@ -75,7 +75,7 @@ func ShowNotRegisteredModuleAndActivities(env environment.Environment, courses [
 func getCourseDetails(env environment.Environment, course blueprint.CourseSummary) blueprint.CourseDetails {
 	var userCourse blueprint.CourseDetails
 	detailsEndpoint := fmt.Sprintf(blueprint.CourseDetailsEndpoint, course.Scolaryear, course.Code, course.Codeinstance)
-	if response, err := http.Get(endpoint.EpitechStartPoint + env.GetAuthentication() + detailsEndpoint); err != nil {
+	if response, err := http.Get(blueprint.EpitechStartPoint + env.GetAuthentication() + detailsEndpoint); err != nil {
 		log.Fatal("Invalid response: " + err.Error())
 	} else if body, err := ioutil.ReadAll(response.Body); err != nil {
 		log.Fatal("Invalid read: " + err.Error())
@@ -87,7 +87,7 @@ func getCourseDetails(env environment.Environment, course blueprint.CourseSummar
 
 func GetAllCourses(env environment.Environment) ([]blueprint.Course, error) {
 	var allCourses []blueprint.CourseSummary
-	if response, err := http.Get(endpoint.EpitechStartPoint + env.GetAuthentication() + blueprint.CourseDataEndpoint); err != nil {
+	if response, err := http.Get(blueprint.EpitechStartPoint + env.GetAuthentication() + blueprint.CourseDataEndpoint); err != nil {
 		return nil, err
 	} else if body, err := ioutil.ReadAll(response.Body); err != nil {
 		return nil, err

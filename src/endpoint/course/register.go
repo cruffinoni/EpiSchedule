@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"fmt"
 	"github.com/Dayrion/EpiSchedule/src/blueprint"
-	"github.com/Dayrion/EpiSchedule/src/endpoint"
 	"github.com/Dayrion/EpiSchedule/src/environment"
 	"io/ioutil"
 	"log"
@@ -20,7 +19,7 @@ func RegisterUserToAnActivity(env environment.Environment, course blueprint.Cour
 			env.Errorf("Activity id %v found but there is no active event. Abort.\n", activity.ActivityCode)
 			return
 		}
-		urlHeader := endpoint.EpitechStartPoint + env.GetAuthentication()
+		urlHeader := blueprint.EpitechStartPoint + env.GetAuthentication()
 		url := urlHeader + fmt.Sprintf("/module/%v/%v/%v/%v/%v/register?format=json",
 			course.Details.Scolaryear, course.Details.Codemodule, course.Details.Codeinstance, activity.ActivityCode, activity.Events[0].Code)
 		req, err := http.NewRequest("POST", url, bytes.NewBuffer([]byte("{}")))

@@ -3,7 +3,6 @@ package reception
 import (
 	"encoding/json"
 	"github.com/Dayrion/EpiSchedule/src/blueprint"
-	"github.com/Dayrion/EpiSchedule/src/endpoint"
 	"github.com/Dayrion/EpiSchedule/src/environment"
 	"io/ioutil"
 	"log"
@@ -22,7 +21,7 @@ func getIntFromStr(number string) int {
 
 func GetCurrentUserSemesterAndCredits(env environment.Environment) (int, blueprint.Credits) {
 	var userReception blueprint.Reception
-	if response, err := http.Get(endpoint.EpitechStartPoint + env.GetAuthentication() + blueprint.ReceptionEndpoint); err != nil {
+	if response, err := http.Get(blueprint.EpitechStartPoint + env.GetAuthentication() + blueprint.ReceptionEndpoint); err != nil {
 		log.Fatal("Invalid response: " + err.Error())
 	} else if body, err := ioutil.ReadAll(response.Body); err != nil {
 		log.Fatal("Invalid read: " + err.Error())
