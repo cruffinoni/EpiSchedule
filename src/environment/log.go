@@ -51,3 +51,7 @@ func (env Environment) Error(msg ...interface{}) {
 func (env Environment) Errorf(msg string, fmt ...interface{}) {
 	log.Printf(msg, fmt...)
 }
+
+func (env Environment) Fatal() {
+	log.Panic()
+}

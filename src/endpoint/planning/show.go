@@ -3,7 +3,7 @@ package planning
 import (
 	"github.com/Dayrion/EpiSchedule/src/blueprint"
 	"github.com/Dayrion/EpiSchedule/src/environment"
-	"utils"
+	"github.com/Dayrion/EpiSchedule/src/utils"
 )
 
 func ShowIncomingEvents(env environment.Environment, courseList []blueprint.Course) {

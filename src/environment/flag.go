@@ -21,7 +21,22 @@ var validCmd = []string{
 	FlagIntrospect,
 }
 
+func getPrintableArgsList() string {
+	list := ""
+	for arg := range validCmd {
+		if arg == 0 {
+			list += validCmd[arg]
+		} else {
+			list += ", " + validCmd[arg]
+		}
+	}
+	return list
+}
+
 func CheckArgs(osArgs []string) {
+	if len(osArgs) < 2 {
+		log.Fatalf("No argument found, at least one is required. Valid args: %v", getPrintableArgsList())
+	}
 	cmdExists := false
 	for i := range validCmd {
 		if validCmd[i] == osArgs[1] {
