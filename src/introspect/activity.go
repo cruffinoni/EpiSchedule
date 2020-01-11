@@ -3,9 +3,10 @@ package introspect
 import (
 	"fmt"
 	"github.com/Dayrion/EpiSchedule/src/blueprint"
+	"github.com/Dayrion/EpiSchedule/src/environment"
 )
 
-func ListAllActivityFromCourses(courses []blueprint.Course) {
+func ListAllActivityFromCourses(_ environment.Environment, courses []blueprint.Course) {
 	fmt.Print("List of all activities type:\n")
 	activities := make(map[string]int)
 	for _, course := range courses {
