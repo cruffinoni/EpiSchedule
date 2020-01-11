@@ -12,10 +12,12 @@ import (
 )
 
 func main() {
-	environment.CheckArgs(os.Args)
 	env := environment.NewEnvironment()
+	environment.InitCommandArg(&env)
 	env.SetVerboseLevel(environment.VerboseDebug)
+	log.Printf("-> %v and %v\n", env.Flag.SpecialSemester, &env.Flag.SpecialSemester)
 	env.RetrieveCommandFlag(os.Args)
+	log.Printf("-> %v\n", env.Flag.SpecialSemester)
 	env.User.Semester, env.User.Credits = reception.GetCurrentUserSemesterAndCredits(env)
 	credits.DisplayCreditsInfo(env)
 	allCourses, err := course.GetAllCourses(env)

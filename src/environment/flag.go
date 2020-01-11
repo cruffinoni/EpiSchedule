@@ -2,11 +2,21 @@ package environment
 
 import (
 	"flag"
+	"fmt"
 	"log"
+	"os"
 )
 
 type Flag struct {
 	SpecialSemester bool
+}
+
+type FlagType []string
+type FlagArg struct {
+	Hold         interface{}
+	DefaultValue interface{}
+	Name         string
+	Description  string
 }
 
 const (
@@ -15,45 +25,82 @@ const (
 	FlagIntrospect = "introspect"
 )
 
-var validCmd = []string{
-	FlagRegister,
-	FlagShow,
-	FlagIntrospect,
+var FlagArgEmpty FlagArg // []FlagArgEmpty
+
+var (
+	validCmd = FlagType{
+		FlagRegister,
+		FlagShow,
+		FlagIntrospect,
+	}
+
+	cmdArg = map[string]FlagArg {
+		FlagRegister: FlagArgEmpty,
+		FlagShow: FlagArgEmpty,
+		FlagIntrospect: FlagArgEmpty,
+	}
+)
+
+func (i *FlagType) String() string {
+	return "my string representation"
 }
 
-func getPrintableArgsList() string {
-	list := ""
-	for arg := range validCmd {
-		if arg == 0 {
-			list += validCmd[arg]
-		} else {
-			list += ", " + validCmd[arg]
-		}
-	}
-	return list
+func (i *FlagType) Set(value string) error {
+	*i = append(*i, value)
+	return nil
 }
 
-func CheckArgs(osArgs []string) {
-	if len(osArgs) < 2 {
-		log.Fatalf("No argument found, at least one is required. Valid args: %v", getPrintableArgsList())
+func SetArgToCmd(cmd string, arg FlagArg) {
+	if cmdArg[cmd] != FlagArgEmpty {
+		return
 	}
-	cmdExists := false
-	for i := range validCmd {
-		if validCmd[i] == osArgs[1] {
-			cmdExists = true
-		}
-	}
-	if !cmdExists {
-		log.Fatalf("Unknown argument: '%v'\n", osArgs[1])
-	}
+	cmdArg[cmd] = arg
 }
 
 func (env *Environment) RetrieveCommandFlag(args []string) {
-	if args[1] == FlagRegister {
-		flagSet := flag.NewFlagSet(ProjectName, flag.PanicOnError)
-		flagSet.BoolVar(&env.Flag.SpecialSemester, "special-semester", false, "Register the semester 0 as a valid one.")
-		_ = flagSet.Parse(args[2:])
-	} else if args[1] == FlagIntrospect {
-		env.Flag.SpecialSemester = true
+	flagSet := flag.NewFlagSet(ProjectName, flag.PanicOnError)
+	flagSet.Var(&validCmd, "command", "The main command")
+	if len(args) < 2 {
+		flagSet.Usage()
+		os.Exit(1)
 	}
+	_ = flagSet.Parse(args[2:])
+	for cmd, arg := range cmdArg {
+		if arg != FlagArgEmpty {
+			argCmdSet := flag.NewFlagSet(cmd, flag.PanicOnError)
+			fmt.Printf("New arg for cmd: %v w/ %v\n", cmd, arg.Hold)
+			switch arg.Hold.(type) {
+			case nil:
+				log.Fatalf("command %v has an nil type\n", arg.Name)
+			case *int:
+				arg.Hold = argCmdSet.Int(arg.Name, arg.DefaultValue.(int), arg.Description)
+			case *bool:
+				arg.Hold = argCmdSet.Bool(arg.Name, arg.DefaultValue.(bool), arg.Description)
+			case *string:
+				arg.Hold = argCmdSet.String(arg.Name, arg.DefaultValue.(string), arg.Description)
+			default:
+				log.Fatalf("command %v has an unknown type\n", arg.Name)
+			}
+			//if len(args) < 3 {
+			//	argCmdSet.Usage()
+			//	os.Exit(1)
+			//}
+			_ = flagSet.Parse(args[2:])
+		}
+	}
+}
+
+func InitCommandArg(env *Environment) {
+	SetArgToCmd(FlagRegister, FlagArg{
+		Hold:         &env.Flag.SpecialSemester,
+		DefaultValue: false,
+		Name:         "special-semester",
+		Description:  "Register the semester 0 as a valid one.",
+	})
+	SetArgToCmd(FlagIntrospect, FlagArg{
+		Hold:         &env.Flag.SpecialSemester,
+		DefaultValue: true,
+		Name:         "special-semester",
+		Description:  "Register the semester 0 as a valid one. It will give more type.",
+	})
 }

@@ -31,12 +31,8 @@ type Environment struct {
 
 func NewEnvironment() Environment {
 	fmt.Print("Program initialization...\n")
-	authentication := GetAuthLoginLinkFromEnv()
-	if authentication == "" {
-		log.Fatal("Unable to retrieve autologin link from env\n")
-	}
 	env := Environment{
-		authentication: authentication,
+		authentication: GetAuthLoginLinkFromEnv(),
 		Client:         http.DefaultClient,
 		User: UserData{
 			Semester: 0,
@@ -44,6 +40,9 @@ func NewEnvironment() Environment {
 		verbose:        VerboseDefault,
 		googleCalendar: nil,
 		ctx:            context.Background(),
+	}
+	if env.authentication == "" {
+		log.Fatal("Unable to retrieve autologin link from env\n")
 	}
 	testConnection(env)
 	fmt.Print("Initialization done...\n")

@@ -2,6 +2,7 @@ package course
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"github.com/Dayrion/EpiSchedule/src/blueprint"
 	"github.com/Dayrion/EpiSchedule/src/environment"
@@ -87,8 +88,12 @@ func getCourseDetails(env environment.Environment, course blueprint.CourseSummar
 
 func GetAllCourses(env environment.Environment) ([]blueprint.Course, error) {
 	var allCourses []blueprint.CourseSummary
-	if response, err := http.Get(blueprint.EpitechStartPoint + env.GetAuthentication() + blueprint.CourseDataEndpoint); err != nil {
-		return nil, err
+	fmt.Print(blueprint.EpitechStartPoint + env.GetAuthentication() + blueprint.CourseDataEndpoint + "\n")
+	if response, err := http.Get(blueprint.EpitechStartPoint + env.GetAuthentication() + blueprint.CourseDataEndpoint); err != nil || (response != nil && response.StatusCode != http.StatusOK) {
+		if err != nil {
+			return nil, err
+		}
+		return nil, errors.New(fmt.Sprintf("got response code %v but wanted %v", response.StatusCode, http.StatusOK))
 	} else if body, err := ioutil.ReadAll(response.Body); err != nil {
 		return nil, err
 	} else if err := json.Unmarshal(body, &allCourses); err != nil {
