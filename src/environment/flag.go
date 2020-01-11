@@ -2,11 +2,12 @@ package environment
 
 import (
 	"flag"
-	"fmt"
 	"log"
 	"os"
+	"strings"
 )
 
+// Env flag type
 type Flag struct {
 	SpecialSemester bool
 }
@@ -14,7 +15,7 @@ type Flag struct {
 type FlagType []string
 type FlagArg struct {
 	Hold         interface{}
-	DefaultValue interface{}
+	DefaultValue interface{} // Set a default value if the arg is not optional
 	Name         string
 	Description  string
 }
@@ -23,6 +24,10 @@ const (
 	FlagRegister   = "register"
 	FlagShow       = "show"
 	FlagIntrospect = "introspect"
+
+	stringDefaultValue = ""
+	intDefaultValue    = 0
+	boolDefaultValue   = false
 )
 
 var FlagArgEmpty FlagArg // []FlagArgEmpty
@@ -34,9 +39,9 @@ var (
 		FlagIntrospect,
 	}
 
-	cmdArg = map[string]FlagArg {
-		FlagRegister: FlagArgEmpty,
-		FlagShow: FlagArgEmpty,
+	cmdArg = map[string]FlagArg{
+		FlagRegister:   FlagArgEmpty,
+		FlagShow:       FlagArgEmpty,
 		FlagIntrospect: FlagArgEmpty,
 	}
 )
@@ -50,57 +55,93 @@ func (i *FlagType) Set(value string) error {
 	return nil
 }
 
-func SetArgToCmd(cmd string, arg FlagArg) {
+func SetArgToCmd(env Environment, cmd string, arg FlagArg) {
 	if cmdArg[cmd] != FlagArgEmpty {
+		env.Errorf("Cmd %v has already args set\n", cmd)
 		return
 	}
 	cmdArg[cmd] = arg
 }
 
-func (env *Environment) RetrieveCommandFlag(args []string) {
-	flagSet := flag.NewFlagSet(ProjectName, flag.PanicOnError)
-	flagSet.Var(&validCmd, "command", "The main command")
-	if len(args) < 2 {
-		flagSet.Usage()
-		os.Exit(1)
+func printProgramUsage(env Environment, optional ...string) {
+	if len(optional) < 3 {
+		env.Errorf("Usage of %v:\n\t./%v [command] [arguments]\n\t\t"+
+			"command: One of these main commands: %v\n\t\t"+
+			"arguments: The argument(s) associated to the command\n",
+			ProjectName, strings.ToLower(ProjectName), validCmd)
+	} else {
+		env.Errorf("Usage of %v:\n\t./%v %v [arguments]\n\t\t"+
+			"%v: %v\n",
+			ProjectName, strings.ToLower(ProjectName), optional[0],
+			optional[1], optional[2])
 	}
-	_ = flagSet.Parse(args[2:])
+	os.Exit(1)
+}
+
+func (env *Environment) RetrieveCommandFlag(args []string) {
+	if len(args) < 2 {
+		printProgramUsage(*env)
+	}
 	for cmd, arg := range cmdArg {
-		if arg != FlagArgEmpty {
-			argCmdSet := flag.NewFlagSet(cmd, flag.PanicOnError)
-			fmt.Printf("New arg for cmd: %v w/ %v\n", cmd, arg.Hold)
+		if arg != FlagArgEmpty && args[1] == cmd {
+			argCmdSet := flag.NewFlagSet(cmd, flag.ExitOnError)
 			switch arg.Hold.(type) {
 			case nil:
 				log.Fatalf("command %v has an nil type\n", arg.Name)
 			case *int:
-				arg.Hold = argCmdSet.Int(arg.Name, arg.DefaultValue.(int), arg.Description)
+				defaultValue := intDefaultValue
+				if arg.DefaultValue != nil {
+					defaultValue = arg.DefaultValue.(int)
+				}
+				argCmdSet.IntVar(arg.Hold.(*int), arg.Name, defaultValue, arg.Description)
 			case *bool:
-				arg.Hold = argCmdSet.Bool(arg.Name, arg.DefaultValue.(bool), arg.Description)
+				defaultValue := boolDefaultValue
+				if arg.DefaultValue != nil {
+					defaultValue = arg.DefaultValue.(bool)
+				}
+				argCmdSet.BoolVar(arg.Hold.(*bool), arg.Name, defaultValue, arg.Description)
 			case *string:
-				arg.Hold = argCmdSet.String(arg.Name, arg.DefaultValue.(string), arg.Description)
+				defaultValue := stringDefaultValue
+				if arg.DefaultValue != nil {
+					defaultValue = arg.DefaultValue.(string)
+				}
+				argCmdSet.StringVar(arg.Hold.(*string), arg.Name, defaultValue, arg.Description)
 			default:
 				log.Fatalf("command %v has an unknown type\n", arg.Name)
 			}
-			//if len(args) < 3 {
-			//	argCmdSet.Usage()
-			//	os.Exit(1)
-			//}
-			_ = flagSet.Parse(args[2:])
+			_ = argCmdSet.Parse(args[2:])
+			switch arg.Hold.(type) {
+			case *int:
+				if arg.DefaultValue == nil && *arg.Hold.(*int) == intDefaultValue {
+					printProgramUsage(*env, cmd, arg.Name, arg.Description)
+				}
+			case *bool:
+				if arg.DefaultValue == nil && *arg.Hold.(*bool) == boolDefaultValue {
+					printProgramUsage(*env, cmd, arg.Name, arg.Description)
+				}
+			case *string:
+				if arg.DefaultValue == nil && *arg.Hold.(*string) == stringDefaultValue {
+					printProgramUsage(*env, cmd, arg.Name, arg.Description)
+				}
+			}
+			return
 		}
 	}
+	env.Errorf("Unknown command '%v'.\n", args[1])
+	printProgramUsage(*env)
 }
 
 func InitCommandArg(env *Environment) {
-	SetArgToCmd(FlagRegister, FlagArg{
+	SetArgToCmd(*env, FlagRegister, FlagArg{
 		Hold:         &env.Flag.SpecialSemester,
 		DefaultValue: false,
 		Name:         "special-semester",
-		Description:  "Register the semester 0 as a valid one.",
+		Description:  "(Optional) Register the semester 0 as a valid one.",
 	})
-	SetArgToCmd(FlagIntrospect, FlagArg{
+	SetArgToCmd(*env, FlagIntrospect, FlagArg{
 		Hold:         &env.Flag.SpecialSemester,
 		DefaultValue: true,
 		Name:         "special-semester",
-		Description:  "Register the semester 0 as a valid one. It will give more type.",
+		Description:  "(Optional) Register the semester 0 as a valid one. It will give more type.",
 	})
 }

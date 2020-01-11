@@ -26,6 +26,7 @@ func GetCurrentUserSemesterAndCredits(env environment.Environment) (int, bluepri
 	} else if body, err := ioutil.ReadAll(response.Body); err != nil {
 		log.Fatal("Invalid read: " + err.Error())
 	} else if err := json.Unmarshal(body, &userReception); err != nil {
+		log.Printf("(Body): '%v'\n", string(body))
 		log.Fatal("Invalid unmarshal: " + err.Error())
 	}
 	if len(userReception.Current) == 0 {

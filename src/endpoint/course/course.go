@@ -88,7 +88,6 @@ func getCourseDetails(env environment.Environment, course blueprint.CourseSummar
 
 func GetAllCourses(env environment.Environment) ([]blueprint.Course, error) {
 	var allCourses []blueprint.CourseSummary
-	fmt.Print(blueprint.EpitechStartPoint + env.GetAuthentication() + blueprint.CourseDataEndpoint + "\n")
 	if response, err := http.Get(blueprint.EpitechStartPoint + env.GetAuthentication() + blueprint.CourseDataEndpoint); err != nil || (response != nil && response.StatusCode != http.StatusOK) {
 		if err != nil {
 			return nil, err
