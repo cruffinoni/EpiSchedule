@@ -9,10 +9,13 @@ func SetArgToCmd(cmd string, arg ProgArg) {
 	if _, ok := cmdArg[cmd]; !ok {
 		log.Fatalf("nonexistent cmd: %v\n", cmd)
 	}
-	if !cmdArg[cmd].Args.IsEqual(ArgEmpty) {
-		log.Fatalf("cmd %v has already args set.\n", cmd)
+	for _, cmdArg := range cmdArg[cmd].Args {
+		if cmdArg.IsEqual(arg) {
+			log.Fatalf("cmd %v has multiple definition of the arg: %v.\n",
+				cmd, arg.Name)
+		}
 	}
-	cmdArg[cmd].Args = arg
+	cmdArg[cmd].Args = append(cmdArg[cmd].Args, arg)
 }
 
 func SetPreHandlerToCmd(cmd string, handler func()) {
@@ -41,5 +44,11 @@ func InitCommandArg(env *environment.Environment) {
 		DefaultValue: true,
 		Name:         "special-semester",
 		Description:  "(Optional) Register the semester 0 as a valid one. It will give more type.",
+	})
+	SetArgToCmd(ArgIntrospect, ProgArg{
+		Hold:         &env.Flag.SaveActivities,
+		DefaultValue: true,
+		Name:         "save",
+		Description:  "(Optional) Save the displayed activities.",
 	})
 }

@@ -29,8 +29,7 @@ func main() {
 	flag.SetHandlerToCmd(flag.ArgRegister, course.ShowNotRegisteredModuleAndActivities)
 	flag.SetHandlerToCmd(flag.ArgShow, planning.ShowIncomingEvents)
 	flag.SetHandlerToCmd(flag.ArgIntrospect, introspect.ListAllActivityFromCourses)
-
 	flag.InitCommandArg(&env)
-	cmd := flag.RetrieveCommandFlag(&env, os.Args)
+	cmd := flag.RetrieveCommand(&env, os.Args)
 	cmd.ExecuteHandlers(env, allCourses)
 }

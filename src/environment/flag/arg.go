@@ -25,7 +25,7 @@ type ProgArg struct {
 }
 
 type ProgCmd struct {
-	Args       ProgArg // []ProgArg
+	Args       []ProgArg
 	preHandler func()
 	handler    HandlerCmd
 }

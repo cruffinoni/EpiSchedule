@@ -40,50 +40,54 @@ func printProgramUsage(env environment.Environment, optional ...string) {
 	os.Exit(1)
 }
 
-func RetrieveCommandFlag(env *environment.Environment, args []string) *ProgCmd {
+func RetrieveCommand(env *environment.Environment, args []string) *ProgCmd {
 	if len(args) < 2 {
 		printProgramUsage(*env)
 	}
 	for cmdName, cmd := range cmdArg {
-		if !cmd.Args.IsEqual(ArgEmpty) && args[1] == cmdName {
+		if args[1] == cmdName {
 			argCmdSet := flag.NewFlagSet(cmdName, flag.ExitOnError)
-			switch cmd.Args.Hold.(type) {
-			case nil:
-				log.Fatalf("command %v has an nil type\n", cmd.Args.Name)
-			case *int:
-				defaultValue := intDefaultValue
-				if cmd.Args.DefaultValue != nil {
-					defaultValue = cmd.Args.DefaultValue.(int)
+			for _, arg := range cmd.Args {
+				switch arg.Hold.(type) {
+				case nil:
+					log.Fatalf("command %v has an nil type\n", arg.Name)
+				case *int:
+					defaultValue := intDefaultValue
+					if arg.DefaultValue != nil {
+						defaultValue = arg.DefaultValue.(int)
+					}
+					argCmdSet.IntVar(arg.Hold.(*int), arg.Name, defaultValue, arg.Description)
+				case *bool:
+					defaultValue := boolDefaultValue
+					if arg.DefaultValue != nil {
+						defaultValue = arg.DefaultValue.(bool)
+					}
+					argCmdSet.BoolVar(arg.Hold.(*bool), arg.Name, defaultValue, arg.Description)
+				case *string:
+					defaultValue := stringDefaultValue
+					if arg.DefaultValue != nil {
+						defaultValue = arg.DefaultValue.(string)
+					}
+					argCmdSet.StringVar(arg.Hold.(*string), arg.Name, defaultValue, arg.Description)
+				default:
+					log.Fatalf("command %v has an unknown type\n", arg.Name)
 				}
-				argCmdSet.IntVar(cmd.Args.Hold.(*int), cmd.Args.Name, defaultValue, cmd.Args.Description)
-			case *bool:
-				defaultValue := boolDefaultValue
-				if cmd.Args.DefaultValue != nil {
-					defaultValue = cmd.Args.DefaultValue.(bool)
-				}
-				argCmdSet.BoolVar(cmd.Args.Hold.(*bool), cmd.Args.Name, defaultValue, cmd.Args.Description)
-			case *string:
-				defaultValue := stringDefaultValue
-				if cmd.Args.DefaultValue != nil {
-					defaultValue = cmd.Args.DefaultValue.(string)
-				}
-				argCmdSet.StringVar(cmd.Args.Hold.(*string), cmd.Args.Name, defaultValue, cmd.Args.Description)
-			default:
-				log.Fatalf("command %v has an unknown type\n", cmd.Args.Name)
 			}
 			_ = argCmdSet.Parse(args[2:])
-			switch cmd.Args.Hold.(type) {
-			case *int:
-				if cmd.Args.DefaultValue == nil && *cmd.Args.Hold.(*int) == intDefaultValue {
-					printProgramUsage(*env, cmdName, cmd.Args.Name, cmd.Args.Description)
-				}
-			case *bool:
-				if cmd.Args.DefaultValue == nil && *cmd.Args.Hold.(*bool) == boolDefaultValue {
-					printProgramUsage(*env, cmdName, cmd.Args.Name, cmd.Args.Description)
-				}
-			case *string:
-				if cmd.Args.DefaultValue == nil && *cmd.Args.Hold.(*string) == stringDefaultValue {
-					printProgramUsage(*env, cmdName, cmd.Args.Name, cmd.Args.Description)
+			for _, arg := range cmd.Args {
+				switch arg.Hold.(type) {
+				case *int:
+					if arg.DefaultValue == nil && *arg.Hold.(*int) == intDefaultValue {
+						printProgramUsage(*env, cmdName, arg.Name, arg.Description)
+					}
+				case *bool:
+					if arg.DefaultValue == nil && *arg.Hold.(*bool) == boolDefaultValue {
+						printProgramUsage(*env, cmdName, arg.Name, arg.Description)
+					}
+				case *string:
+					if arg.DefaultValue == nil && *arg.Hold.(*string) == stringDefaultValue {
+						printProgramUsage(*env, cmdName, arg.Name, arg.Description)
+					}
 				}
 			}
 			return cmd
