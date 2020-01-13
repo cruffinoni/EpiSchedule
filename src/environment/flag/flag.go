@@ -12,16 +12,19 @@ import (
 var ArgEmpty ProgArg
 
 var (
+	// TODO: automation of the whole process
 	validCmd = ArgType{
 		ArgRegister,
 		ArgShow,
 		ArgIntrospect,
+		ArgUpdate,
 	}
 
 	cmdArg = map[string]*ProgCmd{
 		ArgRegister:   new(ProgCmd),
 		ArgShow:       new(ProgCmd),
 		ArgIntrospect: new(ProgCmd),
+		ArgUpdate:     new(ProgCmd),
 	}
 )
 

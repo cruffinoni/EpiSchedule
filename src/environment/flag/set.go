@@ -18,7 +18,7 @@ func SetArgToCmd(cmd string, arg ProgArg) {
 	cmdArg[cmd].Args = append(cmdArg[cmd].Args, arg)
 }
 
-func SetPreHandlerToCmd(cmd string, handler PreHandlerType) {
+func SetUpPreHandler(cmd string, handler PreHandlerType) {
 	if _, ok := cmdArg[cmd]; !ok {
 		log.Fatalf("nonexistent cmd: %v\n", cmd)
 	}

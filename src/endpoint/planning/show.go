@@ -23,7 +23,7 @@ func ShowIncomingEvents(env environment.Environment, courseList []blueprint.Cour
 				continue
 			}
 			if activity.Events[0].AlreadyRegister != "" {
-				if utils.IsDateAfterNow(activity.Begin) {
+				if utils.IsDateAfterNow(activity.End) {
 					env.Logf(environment.VerboseSimple, environment.ColorRed+"	! You are registered to the activity [%v] coming from '%v' but the activity is gone.\n",
 						activity.Title, course.Summary.Title)
 					env.Logf(environment.VerboseSimple, environment.ColorRed+"		! The even ended at %v\n",

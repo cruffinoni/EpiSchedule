@@ -1,1 +1,24 @@
-{"activities":["Follow-up","Conference","Pitch","TEPitech","Experience","Project","BTTF","Delivery","Kick-off","Event","Mini-project"]}
+{
+  "activities": [
+    "Kick-off",
+    "Mini-project",
+    "Corrections",
+    "Conference",
+    "Debriefing",
+    "(OLD) RDV ADM",
+    "Defense",
+    "Event",
+    "Experience",
+    "TEPitech",
+    "Workshop",
+    "Accompagnement",
+    "Stumper",
+    "Project",
+    "Review",
+    "Keynote",
+    "BTTF",
+    "Follow-up",
+    "Pitch",
+    "Delivery"
+  ]
+}

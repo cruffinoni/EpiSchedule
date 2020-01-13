@@ -20,7 +20,7 @@ func listActivity(courses []blueprint.Course) map[string]int {
 	return activities
 }
 
-func ListAllActivityFromCourses(env environment.Environment, courses []blueprint.Course) {
+func ShowActivitiesTypeFromCourses(env environment.Environment, courses []blueprint.Course) {
 	env.Log(environment.VerboseSimple, "List of all activities type:\n")
 	activities := listActivity(courses)
 	i := 0
@@ -34,10 +34,11 @@ func ListAllActivityFromCourses(env environment.Environment, courses []blueprint
 		actList = append(actList, activityName)
 		i++
 	}
+	fmt.Print("\n")
 	if env.Flag.SaveActivities {
 		env.Log(environment.VerboseSimple, "Registering all activities.\n")
-		SaveActivities(blueprint.Activity{
-			Activities:actList,
+		saveActivities(blueprint.Activity{
+			Activities: actList,
 		})
 		env.Log(environment.VerboseSimple, "Activities saved.\n")
 	}

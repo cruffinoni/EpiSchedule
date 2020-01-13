@@ -9,6 +9,7 @@ const (
 	ArgRegister   = "register"
 	ArgShow       = "show"
 	ArgIntrospect = "introspect"
+	ArgUpdate     = "update"
 
 	stringDefaultValue = ""
 	intDefaultValue    = 0

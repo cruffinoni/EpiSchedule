@@ -16,19 +16,21 @@ func main() {
 	env := environment.NewEnvironment()
 	env.SetVerboseLevel(environment.VerboseDebug)
 	allCourses, err := course.GetAllCourses(env)
+	introspect.PopulateActivityType(env, allCourses)
 	if err != nil {
 		log.Fatalf("An error occured during retrieving all courses: %v\n", err.Error())
 	}
-	flag.SetPreHandlerToCmd(flag.ArgRegister, func(env *environment.Environment) {
+	flag.SetUpPreHandler(flag.ArgRegister, func(env *environment.Environment) {
 		env.AddAutoRegisterActivity(environment.ActivityKickOff, environment.ActivityProjectTime)
 	})
-	flag.SetPreHandlerToCmd(flag.ArgShow, func(env *environment.Environment) {
+	flag.SetUpPreHandler(flag.ArgShow, func(env *environment.Environment) {
 		env.SetUpCalendar()
 		env.AddAutoRegisterCalendarActivity(environment.ActivityPitch, environment.ActivityKickOff, environment.ActivityProjectTime, environment.ActivityTP)
 	})
 	flag.SetHandlerToCmd(flag.ArgRegister, course.ShowNotRegisteredModuleAndActivities)
 	flag.SetHandlerToCmd(flag.ArgShow, planning.ShowIncomingEvents)
-	flag.SetHandlerToCmd(flag.ArgIntrospect, introspect.ListAllActivityFromCourses)
+	flag.SetHandlerToCmd(flag.ArgIntrospect, introspect.ShowActivitiesTypeFromCourses)
+	flag.SetHandlerToCmd(flag.ArgUpdate, introspect.UpdateActivityList)
 	flag.InitCommandArg(&env)
 	cmd := flag.RetrieveCommand(&env, os.Args)
 	cmd.ExecuteHandlers(&env, allCourses)

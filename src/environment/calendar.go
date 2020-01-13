@@ -200,8 +200,8 @@ func (env Environment) AddEvent(activity blueprint.CourseActivity) {
 	} else {
 		locationName = "N/A"
 	}
-	color := activityColor[activity.TypeTitle]
-	if activityColor[activity.TypeTitle] == "" {
+	color := AvailableActivity[activity.TypeTitle]
+	if AvailableActivity[activity.TypeTitle] == "" {
 		color = "1"
 		env.Errorf("Activity named '%v' is unknown to %v. Back to the default color.\n", activity.TypeTitle, ProjectName)
 	}
