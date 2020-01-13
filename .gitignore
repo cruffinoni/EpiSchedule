@@ -15,5 +15,4 @@
 *.idea
 
 # Make sure any sensitive files aren't pushed
-google/credentials.json
-google/token.json
+google/*.json

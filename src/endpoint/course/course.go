@@ -47,8 +47,8 @@ func checkAllActivitiesFromModule(env environment.Environment, course blueprint.
 						RegisterUserToAnActivity(env, course, activity.ActivityCode)
 					}
 				} else {
-						env.Logf(environment.VerboseSimple, environment.ColorRed+"		!~ You can't register automatically to this activity because the registrations aren't open: room undefined, no maximum seats specified nor registrations closed.\n"+
-							"		!~ You may look the appointments slots on the Epitech's intranet.\n")
+					env.Logf(environment.VerboseSimple, environment.ColorRed+"		!~ You can't register automatically to this activity because the registrations aren't open: room undefined, no maximum seats specified nor registrations closed.\n"+
+						"		!~ You may look the appointments slots on the Epitech's intranet.\n")
 				}
 			}
 		} else {
@@ -91,6 +91,20 @@ func getCourseDetails(env environment.Environment, course blueprint.CourseSummar
 	return userCourse
 }
 
+func createCoursesList(env environment.Environment, allCourses []blueprint.CourseSummary) []blueprint.Course {
+	userCourse := make([]blueprint.Course, 0)
+	for _, course := range allCourses {
+		if course.Semester < env.User.Semester && (env.User.Semester != 0 && !env.Flag.SpecialSemester) {
+			continue
+		}
+		userCourse = append(userCourse, blueprint.Course{
+			Summary: course,
+			Details: getCourseDetails(env, course),
+		})
+	}
+	return userCourse
+}
+
 func GetAllCourses(env environment.Environment) ([]blueprint.Course, error) {
 	var allCourses []blueprint.CourseSummary
 	if response, err := http.Get(blueprint.EpitechStartPoint + env.GetAuthentication() + blueprint.CourseDataEndpoint); err != nil || (response != nil && response.StatusCode != http.StatusOK) {
@@ -103,15 +117,20 @@ func GetAllCourses(env environment.Environment) ([]blueprint.Course, error) {
 	} else if err := json.Unmarshal(body, &allCourses); err != nil {
 		return nil, err
 	}
-	userCourse := make([]blueprint.Course, 0)
-	for _, course := range allCourses {
-		if course.Semester < env.User.Semester && (env.User.Semester != 0 && !env.Flag.SpecialSemester) {
-			continue
+	return createCoursesList(env, allCourses), nil
+}
+
+func GetCustomCourses(env environment.Environment, endpoint string) ([]blueprint.Course, error) {
+	var allCourses []blueprint.CourseSummary
+	if response, err := http.Get(endpoint); err != nil || (response != nil && response.StatusCode != http.StatusOK) {
+		if err != nil {
+			return nil, err
 		}
-		userCourse = append(userCourse, blueprint.Course{
-			Summary: course,
-			Details: getCourseDetails(env, course),
-		})
+		return nil, errors.New(fmt.Sprintf("got response code %v but wanted %v", response.StatusCode, http.StatusOK))
+	} else if body, err := ioutil.ReadAll(response.Body); err != nil {
+		return nil, err
+	} else if err := json.Unmarshal(body, &allCourses); err != nil {
+		return nil, err
 	}
-	return userCourse, nil
+	return createCoursesList(env, allCourses), nil
 }

@@ -2,12 +2,14 @@ package introspect
 
 import (
 	"encoding/json"
+	"endpoint/course"
 	"github.com/Dayrion/EpiSchedule/src/blueprint"
 	"github.com/Dayrion/EpiSchedule/src/environment"
 	"io/ioutil"
 	"log"
 	"math/rand"
 	"os"
+	"strings"
 )
 
 const activityPathFile = "./resources/activities.json"
@@ -27,28 +29,23 @@ func saveActivities(activities blueprint.Activity) {
 	}
 }
 
-func PopulateActivityType(env environment.Environment, courses []blueprint.Course) {
-	env.Log(environment.VerboseDebug, "Retrieving a list of all activities\n")
+func PopulateActivityType(env environment.Environment, _ []blueprint.Course) {
+	env.Log(environment.VerboseDebug, "-> Retrieving a list of all activities\n")
 	file, err := ioutil.ReadFile(activityPathFile)
 	var activityList []string
 	if err != nil {
-		activities := listActivity(courses)
-		var actList []string
-		for activityName := range activities {
-			actList = append(actList, activityName)
-		}
-		saveActivities(blueprint.Activity{
-			Activities: actList,
-		})
-		activityList = actList
-	} else {
-		var actList blueprint.Activity
-		err := json.Unmarshal(file, &actList)
-		if err != nil {
-			log.Fatalf("Unable to unmarshal: %v\n", err.Error())
-		}
-		activityList = actList.Activities
+		env.Log(environment.VerboseDebug, "No activity found. Let's update the resources.\n")
+		UpdateActivityList(env, nil)
+		env.Log(environment.VerboseDebug, "List created, let's retry...\n")
+		PopulateActivityType(env, nil)
+		return
 	}
+	var actList blueprint.Activity
+	err = json.Unmarshal(file, &actList)
+	if err != nil {
+		log.Fatalf("Unable to unmarshal: %v\n", err.Error())
+	}
+	activityList = actList.Activities
 	i := 0
 	for _, activity := range activityList {
 		switch i {
@@ -62,29 +59,39 @@ func PopulateActivityType(env environment.Environment, courses []blueprint.Cours
 		}
 		i++
 	}
-	env.Logf(environment.VerboseDebug, "%v activity has been found\n", len(activityList))
+	env.Logf(environment.VerboseDebug, "-> %v activity has been found\n", len(activityList))
 }
 
-func UpdateActivityList(env environment.Environment, courses []blueprint.Course) {
-	env.Log(environment.VerboseDebug, "Updating the activity list...\n")
+func UpdateActivityList(env environment.Environment, _ []blueprint.Course) {
+	env.Log(environment.VerboseDebug, "Updating the activity list, it might take some time...\n")
 	update := false
-	for _, course := range courses {
-		if len(course.Details.Activities) == 0 {
-			continue
+	for i := 0; i < 2; i++ {
+		endpoint := blueprint.CourseDataEndpoint
+		endpoint = strings.Replace(endpoint, "2019", "201"+string('8'+i), -1)
+		courses, err := course.GetCustomCourses(env, blueprint.EpitechStartPoint+env.GetAuthentication()+endpoint)
+		if err != nil {
+			log.Fatalf("Error while retrieving courses: %v\n", err.Error())
 		}
-		activityName := course.Details.Activities[0].TypeTitle
-		if _, ok := environment.AvailableActivity[activityName]; !ok {
-			environment.AvailableActivity[activityName] = string(rand.Int()%9 + 48)
-			update = true
+		for _, specificCourse := range courses {
+			if len(specificCourse.Details.Activities) == 0 {
+				continue
+			}
+			activityName := specificCourse.Details.Activities[0].TypeTitle
+			if _, ok := environment.AvailableActivity[activityName]; !ok {
+				environment.AvailableActivity[activityName] = string(rand.Int()%9 + 48)
+				update = true
+			}
 		}
 	}
 	if update {
 		actiList := make([]string, 0)
+		count := 0
 		for i := range environment.AvailableActivity {
 			actiList = append(actiList, i)
+			count++
 		}
 		saveActivities(blueprint.Activity{Activities: actiList})
-		env.Log(environment.VerboseDebug, "Activity list updated\n")
+		env.Log(environment.VerboseDebug, "%v activity added.\n", count)
 	} else {
 		env.Log(environment.VerboseDebug, "No activity added.\n")
 	}
