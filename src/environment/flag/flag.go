@@ -98,11 +98,11 @@ func RetrieveCommand(env *environment.Environment, args []string) *ProgCmd {
 	return nil
 }
 
-func (cmd *ProgCmd) ExecuteHandlers(env environment.Environment, courses []blueprint.Course) {
+func (cmd *ProgCmd) ExecuteHandlers(env *environment.Environment, courses []blueprint.Course) {
 	if cmd.preHandler != nil {
-		cmd.preHandler()
+		cmd.preHandler(env)
 	}
 	if cmd.handler != nil {
-		cmd.handler(env, courses)
+		cmd.handler(*env, courses)
 	}
 }

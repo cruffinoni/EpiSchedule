@@ -34,16 +34,21 @@ func checkAllActivitiesFromModule(env environment.Environment, course blueprint.
 					activity.Title, activity.Begin)
 			}
 		} else if activity.Events[0].AlreadyRegister == "" {
-			missingOne = true
-			env.Logf(environment.VerboseSimple, environment.ColorRed+"	!! You are not registered to [%v] which is: [%v]\n",
-				activity.Title, activity.TypeTitle)
-			if env.IsAutoRegisteredActivity(activity.TypeTitle) {
-				if !isAbleToRegister(activity) {
-					env.Logf(environment.VerboseSimple, environment.ColorRed+"		!~ You can't register automatically to this activity because the registrations aren't open: room undefined nor no maximum seats specified nor registrations closed.\n"+
-						"		!~ You may look the appointments slots on the Epitech's intranet.\n")
+			if utils.IsDateAfterNow(activity.End) && (activity.EndRegister == "" || !isAbleToRegister(activity)) {
+				env.Logf(environment.VerboseSimple, environment.ColorBrightYellow+"	!- You are not registered to [%v] but the activity is already done or you are unable to register.\n",
+					activity.Title)
+			} else {
+				env.Logf(environment.VerboseSimple, environment.ColorRed+"	!! You are not registered to [%v] typed as [%v] and begin at %v\n",
+					activity.Title, activity.TypeTitle, activity.Begin)
+				if isAbleToRegister(activity) {
+					missingOne = true
+					if env.IsAutoRegisteredActivity(activity.TypeTitle) {
+						env.Logf(environment.VerboseSimple, environment.ColorCyan+"		~ I'll register you to the activity id %v\n", activity.ActivityCode)
+						RegisterUserToAnActivity(env, course, activity.ActivityCode)
+					}
 				} else {
-					env.Logf(environment.VerboseSimple, "		~ I'll register you to the activity id %v\n", activity.ActivityCode)
-					RegisterUserToAnActivity(env, course, activity.ActivityCode)
+						env.Logf(environment.VerboseSimple, environment.ColorRed+"		!~ You can't register automatically to this activity because the registrations aren't open: room undefined, no maximum seats specified nor registrations closed.\n"+
+							"		!~ You may look the appointments slots on the Epitech's intranet.\n")
 				}
 			}
 		} else {
@@ -52,7 +57,7 @@ func checkAllActivitiesFromModule(env environment.Environment, course blueprint.
 		}
 	}
 	if !missingOne {
-		env.Logf(environment.VerboseSimple, environment.ColorCyan+"	+ You are registered to all activities for this module.\n")
+		env.Logf(environment.VerboseSimple, environment.ColorCyan+"	+ You are registered for all possible activities in this module.\n")
 	}
 }
 

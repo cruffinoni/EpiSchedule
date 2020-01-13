@@ -8,6 +8,7 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"os"
 )
 
 func RegisterUserToAnActivity(env environment.Environment, course blueprint.Course, activityId string) {
@@ -38,6 +39,7 @@ func RegisterUserToAnActivity(env environment.Environment, course blueprint.Cour
 			} else {
 				env.Errorf("Body: '%v'\n", string(body))
 			}
+			os.Exit(1)
 		} else {
 			env.Log(environment.VerboseDebug, "			+ You have been successfully registered to this activity.\n")
 		}

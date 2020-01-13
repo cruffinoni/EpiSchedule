@@ -18,14 +18,14 @@ func SetArgToCmd(cmd string, arg ProgArg) {
 	cmdArg[cmd].Args = append(cmdArg[cmd].Args, arg)
 }
 
-func SetPreHandlerToCmd(cmd string, handler func()) {
+func SetPreHandlerToCmd(cmd string, handler PreHandlerType) {
 	if _, ok := cmdArg[cmd]; !ok {
 		log.Fatalf("nonexistent cmd: %v\n", cmd)
 	}
 	cmdArg[cmd].preHandler = handler
 }
 
-func SetHandlerToCmd(cmd string, handlerCmd HandlerCmd) {
+func SetHandlerToCmd(cmd string, handlerCmd HandlerType) {
 	if _, ok := cmdArg[cmd]; !ok {
 		log.Fatalf("nonexistent cmd: %v\n", cmd)
 	}

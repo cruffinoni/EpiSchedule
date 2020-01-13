@@ -15,7 +15,8 @@ const (
 	boolDefaultValue   = false
 )
 
-type HandlerCmd func(environment.Environment, []blueprint.Course)
+type HandlerType func(environment.Environment, []blueprint.Course)
+type PreHandlerType func(*environment.Environment)
 
 type ProgArg struct {
 	Hold         interface{}
@@ -26,8 +27,8 @@ type ProgArg struct {
 
 type ProgCmd struct {
 	Args       []ProgArg
-	preHandler func()
-	handler    HandlerCmd
+	preHandler PreHandlerType
+	handler    HandlerType
 }
 
 func (ref ProgArg) IsEqual(toCompare ProgArg) bool {

@@ -19,10 +19,10 @@ func main() {
 	if err != nil {
 		log.Fatalf("An error occured during retrieving all courses: %v\n", err.Error())
 	}
-	flag.SetPreHandlerToCmd(flag.ArgRegister, func() {
+	flag.SetPreHandlerToCmd(flag.ArgRegister, func(env *environment.Environment) {
 		env.AddAutoRegisterActivity(environment.ActivityKickOff, environment.ActivityProjectTime)
 	})
-	flag.SetPreHandlerToCmd(flag.ArgShow, func() {
+	flag.SetPreHandlerToCmd(flag.ArgShow, func(env *environment.Environment) {
 		env.SetUpCalendar()
 		env.AddAutoRegisterCalendarActivity(environment.ActivityPitch, environment.ActivityKickOff, environment.ActivityProjectTime, environment.ActivityTP)
 	})
@@ -31,5 +31,5 @@ func main() {
 	flag.SetHandlerToCmd(flag.ArgIntrospect, introspect.ListAllActivityFromCourses)
 	flag.InitCommandArg(&env)
 	cmd := flag.RetrieveCommand(&env, os.Args)
-	cmd.ExecuteHandlers(env, allCourses)
+	cmd.ExecuteHandlers(&env, allCourses)
 }
