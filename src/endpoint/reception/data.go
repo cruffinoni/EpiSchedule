@@ -29,13 +29,6 @@ func GetCurrentUserSemesterAndCredits(env environment.Environment) (int, bluepri
 		log.Printf("(Body): '%v'\n", string(body))
 		log.Fatal("Invalid unmarshal: " + err.Error())
 	}
-	if len(userReception.Current) == 0 {
-		return 0, blueprint.Credits{
-			Minimum:   0,
-			Aimed:     30,
-			Objective: 60,
-		}
-	}
 	return getIntFromStr(userReception.Current[0].SemesterNum), blueprint.Credits{
 		Minimum:   getIntFromStr(userReception.Current[0].CreditsMin),
 		Aimed:     getIntFromStr(userReception.Current[0].CreditsNorm),

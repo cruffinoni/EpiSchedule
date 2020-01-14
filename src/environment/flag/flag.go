@@ -102,9 +102,11 @@ func RetrieveCommand(env *environment.Environment, args []string) *ProgCmd {
 
 func (cmd *ProgCmd) ExecuteHandlers(env *environment.Environment, courses []blueprint.Course) {
 	if cmd.preHandler != nil {
+		env.Log(environment.VerboseDebug,"Executing pre-handler\n")
 		cmd.preHandler(env)
 	}
 	if cmd.handler != nil {
+		env.Log(environment.VerboseDebug,"Executing handler\n")
 		cmd.handler(*env, courses)
 	}
 }

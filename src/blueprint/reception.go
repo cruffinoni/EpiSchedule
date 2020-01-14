@@ -77,20 +77,33 @@ type Reception struct {
 		Location string `json:"location"`
 	} `json:"infos"`
 	Current []struct {
+		ActiveLog    string `json:"active_log"`
 		CreditsMin   string `json:"credits_min"`
 		CreditsNorm  string `json:"credits_norm"`
 		CreditsObj   string `json:"credits_obj"`
 		NslogMin     string `json:"nslog_min"`
 		NslogNorm    string `json:"nslog_norm"`
-		Credits      string `json:"credits"`
-		Grade        string `json:"grade"`
-		Cycle        string `json:"cycle"`
-		CodeModule   string `json:"code_module"`
-		CurrentCycle string `json:"current_cycle"`
 		SemesterCode string `json:"semester_code"`
 		SemesterNum  string `json:"semester_num"`
-		ActiveLog    string `json:"active_log"`
+		Achieved     int    `json:"achieved"`
+		Failed       int    `json:"failed"`
+		Inprogress   int    `json:"inprogress"`
 	} `json:"current"`
+	//Current []struct {
+	//	CreditsMin   string `json:"credits_min"`
+	//	CreditsNorm  string `json:"credits_norm"`
+	//	CreditsObj   string `json:"credits_obj"`
+	//	NslogMin     string `json:"nslog_min"`
+	//	NslogNorm    string `json:"nslog_norm"`
+	//	Credits      string `json:"credits"`
+	//	Grade        string `json:"grade"`
+	//	Cycle        string `json:"cycle"`
+	//	CodeModule   string `json:"code_module"`
+	//	CurrentCycle string `json:"current_cycle"`
+	//	SemesterCode string `json:"semester_code"`
+	//	SemesterNum  string `json:"semester_num"`
+	//	ActiveLog    string `json:"active_log"`
+	//} `json:"current"`
 }
 
 type Credits struct {
