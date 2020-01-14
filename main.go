@@ -12,6 +12,34 @@ import (
 	"os"
 )
 
+func setUpCommands(env *environment.Environment) {
+	flag.SetHandlerToCmd("register", course.ShowNotRegisteredModuleAndActivities)
+	flag.SetUpPreHandler("register", func(env *environment.Environment) {
+		env.AddAutoRegisterActivity(environment.ActivityKickOff, environment.ActivityProjectTime)
+	})
+	flag.SetArgToCmd("register", flag.ProgArg{
+		Hold:         &env.Flag.SpecialSemester,
+		DefaultValue: false,
+		Name:         "special-semester",
+		Description:  "(Optional) Register the semester 0 as a valid one.",
+	})
+
+	flag.SetHandlerToCmd("introspect", introspect.ShowActivitiesTypeFromCourses)
+	flag.SetArgToCmd("introspect", flag.ProgArg{
+		Hold:         &env.Flag.SpecialSemester,
+		DefaultValue: true,
+		Name:         "special-semester",
+		Description:  "(Optional) Register the semester 0 as a valid one. It will give more type.",
+	})
+
+	flag.SetHandlerToCmd("show", planning.ShowIncomingEvents)
+	flag.SetUpPreHandler("show", func(env *environment.Environment) {
+		env.SetUpCalendar()
+		env.AddAutoRegisterCalendarActivity(environment.ActivityPitch, environment.ActivityKickOff, environment.ActivityProjectTime, environment.ActivityTP)
+	})
+	flag.SetHandlerToCmd("update", introspect.UpdateActivityList)
+}
+
 func main() {
 	env := environment.NewEnvironment()
 	env.SetVerboseLevel(environment.VerboseDebug)
@@ -20,18 +48,7 @@ func main() {
 	if err != nil {
 		log.Fatalf("An error occured during retrieving all courses: %v\n", err.Error())
 	}
-	flag.SetUpPreHandler(flag.ArgRegister, func(env *environment.Environment) {
-		env.AddAutoRegisterActivity(environment.ActivityKickOff, environment.ActivityProjectTime)
-	})
-	flag.SetUpPreHandler(flag.ArgShow, func(env *environment.Environment) {
-		env.SetUpCalendar()
-		env.AddAutoRegisterCalendarActivity(environment.ActivityPitch, environment.ActivityKickOff, environment.ActivityProjectTime, environment.ActivityTP)
-	})
-	flag.SetHandlerToCmd(flag.ArgRegister, course.ShowNotRegisteredModuleAndActivities)
-	flag.SetHandlerToCmd(flag.ArgShow, planning.ShowIncomingEvents)
-	flag.SetHandlerToCmd(flag.ArgIntrospect, introspect.ShowActivitiesTypeFromCourses)
-	flag.SetHandlerToCmd(flag.ArgUpdate, introspect.UpdateActivityList)
-	flag.InitCommandArg(&env)
+	setUpCommands(&env)
 	cmd := flag.RetrieveCommand(&env, os.Args)
 	cmd.ExecuteHandlers(&env, allCourses)
 }

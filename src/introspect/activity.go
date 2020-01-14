@@ -35,11 +35,4 @@ func ShowActivitiesTypeFromCourses(env environment.Environment, courses []bluepr
 		i++
 	}
 	fmt.Print("\n")
-	if env.Flag.SaveActivities {
-		env.Log(environment.VerboseSimple, "Registering all activities.\n")
-		saveActivities(blueprint.Activity{
-			Activities: actList,
-		})
-		env.Log(environment.VerboseSimple, "Activities saved.\n")
-	}
 }

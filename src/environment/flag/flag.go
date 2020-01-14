@@ -9,31 +9,30 @@ import (
 	"strings"
 )
 
-var ArgEmpty ProgArg
-
 var (
-	// TODO: automation of the whole process
-	validCmd = ArgType{
-		ArgRegister,
-		ArgShow,
-		ArgIntrospect,
-		ArgUpdate,
-	}
-
-	cmdArg = map[string]*ProgCmd{
-		ArgRegister:   new(ProgCmd),
-		ArgShow:       new(ProgCmd),
-		ArgIntrospect: new(ProgCmd),
-		ArgUpdate:     new(ProgCmd),
-	}
+	cmdArg = make(map[string]*ProgCmd)
 )
+
+func listCmd() []string {
+	cmdList := make([]string, 0)
+	for cmd := range cmdArg {
+		cmdList = append(cmdList, cmd)
+	}
+	if len(cmdList) == 0 {
+		return []string{
+			"no command found, contact the developer",
+		}
+	} else {
+		return cmdList
+	}
+}
 
 func printProgramUsage(env environment.Environment, optional ...string) {
 	if len(optional) < 3 {
 		env.Errorf("Usage of %v:\n\t./%v [command] [arguments]\n\t\t"+
 			"command: One of these main commands: %v\n\t\t"+
 			"arguments: The argument(s) associated to the command\n",
-			environment.ProjectName, strings.ToLower(environment.ProjectName), validCmd)
+			environment.ProjectName, strings.ToLower(environment.ProjectName), listCmd())
 	} else {
 		env.Errorf("Usage of %v:\n\t./%v %v [arguments]\n\t\t"+
 			"%v: %v\n",
