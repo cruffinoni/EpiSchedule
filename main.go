@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"github.com/Dayrion/EpiSchedule/src/credits"
 	"github.com/Dayrion/EpiSchedule/src/endpoint/course"
 	"github.com/Dayrion/EpiSchedule/src/endpoint/planning"
@@ -15,7 +16,9 @@ import (
 func setUpCommands(env *environment.Environment) {
 	flag.SetHandlerToCmd("register", course.ShowNotRegisteredModuleAndActivities)
 	flag.SetUpPreHandler("register", func(env *environment.Environment) {
-		env.AddAutoRegisterActivity(environment.ActivityKickOff, environment.ActivityProjectTime)
+		env.AddAutoRegisterActivity(environment.ActivityKickOff, environment.ActivityProjectTime,
+			environment.ActivityTP, environment.ActivityConference, environment.ActivityFollowUp,
+			environment.ActivityPitch)
 	})
 	flag.SetArgToCmd("register", flag.ProgArg{
 		Hold:         &env.Flag.SpecialSemester,
@@ -34,8 +37,11 @@ func setUpCommands(env *environment.Environment) {
 
 	flag.SetHandlerToCmd("show", planning.ShowIncomingEvents)
 	flag.SetUpPreHandler("show", func(env *environment.Environment) {
+		fmt.Printf("Going right to prehanlder show\n");
 		env.SetUpCalendar()
-		env.AddAutoRegisterCalendarActivity(environment.ActivityPitch, environment.ActivityKickOff, environment.ActivityProjectTime, environment.ActivityTP)
+		env.AddAutoRegisterCalendarActivity(environment.ActivityKickOff, environment.ActivityProjectTime,
+			environment.ActivityTP, environment.ActivityConference, environment.ActivityFollowUp,
+			environment.ActivityPitch)
 	})
 	flag.SetHandlerToCmd("update", introspect.UpdateActivityList)
 	flag.SetArgToCmd("update", flag.ProgArg{

@@ -34,7 +34,8 @@ func checkAllActivitiesFromModule(env environment.Environment, course blueprint.
 					activity.Title, activity.Begin)
 			}
 		} else if activity.Events[0].AlreadyRegister == "" {
-			if utils.IsDateAfterNow(activity.End) && (activity.EndRegister == "" || !isAbleToRegister(activity)) {
+			//fmt.Printf("Begin: %v & End: %v\n", activity.Begin, activity.End);
+			if utils.IsDateAfterNow(activity.End) || utils.IsDateAfterNow(activity.Events[0].End) || (activity.EndRegister == "" && !isAbleToRegister(activity)) {
 				env.Logf(environment.VerboseSimple, environment.ColorBrightYellow+"	!- You are not registered to [%v] but the activity is already done or you are unable to register.\n",
 					activity.Title)
 			} else {
