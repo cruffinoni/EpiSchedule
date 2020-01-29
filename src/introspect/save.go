@@ -9,7 +9,6 @@ import (
 	"log"
 	"math/rand"
 	"os"
-	"strings"
 )
 
 const activityPathFile = "./resources/activities.json"
@@ -67,22 +66,20 @@ func UpdateActivityList(env environment.Environment, _ []blueprint.Course) {
 	env.Log(environment.VerboseDebug, "Updating the activity list, it might take some time...\n")
 	update := false
 	count := 0
-	for i := 0; i < 2; i++ {
-		endpoint := blueprint.CourseDataEndpoint
-		endpoint = strings.Replace(endpoint, "2019", "201"+string('8'+i), -1)
-		courses, err := course.GetCustomCourses(env, blueprint.EpitechStartPoint+env.GetAuthentication()+endpoint)
-		if err != nil {
-			log.Fatalf("Error while retrieving courses: %v\n", err.Error())
+	courses, err := course.GetAllCourses(env)
+	if err != nil {
+		log.Fatalf("Error while retrieving courses: %v\n", err.Error())
+	}
+	for _, specificCourse := range courses {
+		if len(specificCourse.Details.Activities) == 0 {
+			continue
 		}
-		for _, specificCourse := range courses {
-			if len(specificCourse.Details.Activities) == 0 {
-				continue
-			}
-			activityName := specificCourse.Details.Activities[0].TypeTitle
-			if _, ok := environment.AvailableActivity[activityName]; !ok {
+		for _, allActivities := range specificCourse.Details.Activities {
+			if _, ok := environment.AvailableActivity[allActivities.TypeTitle]; !ok {
 				count++
-				environment.AvailableActivity[activityName] = string(rand.Int()%9 + 48)
+				environment.AvailableActivity[allActivities.TypeTitle] = string(rand.Int()%9 + 48)
 				update = true
+				env.Logf(environment.VerboseDebug, "-> Activity %v will be added.\n", allActivities.TypeTitle)
 			}
 		}
 	}

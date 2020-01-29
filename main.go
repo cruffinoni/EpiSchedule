@@ -16,9 +16,7 @@ import (
 func setUpCommands(env *environment.Environment) {
 	flag.SetHandlerToCmd("register", course.ShowNotRegisteredModuleAndActivities)
 	flag.SetUpPreHandler("register", func(env *environment.Environment) {
-		env.AddAutoRegisterActivity(environment.ActivityKickOff, environment.ActivityProjectTime,
-			environment.ActivityTP, environment.ActivityConference, environment.ActivityFollowUp,
-			environment.ActivityPitch)
+		env.AddAutoRegisterActivity(environment.ActivityToStringArray()...)
 	})
 	flag.SetArgToCmd("register", flag.ProgArg{
 		Hold:         &env.Flag.SpecialSemester,
@@ -39,9 +37,7 @@ func setUpCommands(env *environment.Environment) {
 	flag.SetUpPreHandler("show", func(env *environment.Environment) {
 		fmt.Printf("Going right to prehanlder show\n");
 		env.SetUpCalendar()
-		env.AddAutoRegisterCalendarActivity(environment.ActivityKickOff, environment.ActivityProjectTime,
-			environment.ActivityTP, environment.ActivityConference, environment.ActivityFollowUp,
-			environment.ActivityPitch)
+		env.AddAutoRegisterCalendarActivity(environment.ActivityToStringArray()...)
 	})
 	flag.SetHandlerToCmd("update", introspect.UpdateActivityList)
 	flag.SetArgToCmd("update", flag.ProgArg{
@@ -57,11 +53,11 @@ func main() {
 	env.SetVerboseLevel(environment.VerboseDebug)
 	env.User.Semester, env.User.Credits = reception.GetCurrentUserSemesterAndCredits(env)
 	allCourses, err := course.GetAllCourses(env)
-	credits.DisplayCreditsInfo(env)
-	introspect.PopulateActivityType(env, allCourses)
 	if err != nil {
 		log.Fatalf("An error occured during retrieving all courses: %v\n", err.Error())
 	}
+	credits.DisplayCreditsInfo(env)
+	introspect.PopulateActivityType(env, allCourses)
 	setUpCommands(&env)
 	cmd := flag.RetrieveCommand(&env, os.Args)
 	cmd.ExecuteHandlers(&env, allCourses)

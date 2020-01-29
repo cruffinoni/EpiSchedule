@@ -82,6 +82,7 @@ func ShowNotRegisteredModuleAndActivities(env environment.Environment, courses [
 func getCourseDetails(env environment.Environment, course blueprint.CourseSummary) blueprint.CourseDetails {
 	var userCourse blueprint.CourseDetails
 	detailsEndpoint := fmt.Sprintf(blueprint.CourseDetailsEndpoint, course.Scolaryear, course.Code, course.Codeinstance)
+	log.Printf("-> Endpoint: %v\n", detailsEndpoint);
 	if response, err := http.Get(blueprint.EpitechStartPoint + env.GetAuthentication() + detailsEndpoint); err != nil {
 		log.Fatal("Invalid response: " + err.Error())
 	} else if body, err := ioutil.ReadAll(response.Body); err != nil {

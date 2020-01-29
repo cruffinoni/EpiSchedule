@@ -1,21 +1,21 @@
 package environment
 
-const (
-	ActivityConference  = "Conference"
-	ActivityDefense     = "Defense"
-	ActivityDelivery    = "Delivery"
-	ActivityPitch       = "Pitch"
-	ActivityProject     = "Project"
-	ActivityRush        = "Rush"
-	ActivityTP          = "TP"
-	ActivityKickOff     = "Kick-off"
-	ActivityProjectTime = "Project time"
-	ActivityBTTF        = "BTTF"
-	ActivityMiniProject = "Mini-Project"
-	ActivityTEpitech    = "TEPitech"
-	ActivityFollowUp    = "Follow-up"
-	ActivityEvent       = "Envent"
-)
+//const (
+//	ActivityConference  = "Conference"
+//	ActivityDefense     = "Defense"
+//	ActivityDelivery    = "Delivery"
+//	ActivityPitch       = "Pitch"
+//	ActivityProject     = "Project"
+//	ActivityRush        = "Rush"
+//	ActivityTP          = "TP"
+//	ActivityKickOff     = "Kick-off"
+//	ActivityProjectTime = "Project time"
+//	ActivityBTTF        = "BTTF"
+//	ActivityMiniProject = "Mini-Project"
+//	ActivityTEpitech    = "TEPitech"
+//	ActivityFollowUp    = "Follow-up"
+//	ActivityEvent       = "Envent"
+//)
 
 /*
 	   1 -> #a4bdfc
@@ -65,6 +65,14 @@ const (
 //}
 
 var AvailableActivity = make(map[string]string)
+
+func ActivityToStringArray() []string {
+	tab := make([]string, 0)
+	for act := range AvailableActivity {
+		tab = append(tab, act)
+	}
+	return tab
+}
 
 func isElementPresent(reference []string, element string) bool {
 	if len(reference) == 0 {
