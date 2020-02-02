@@ -29,15 +29,15 @@ func saveActivities(activities blueprint.Activity) {
 	}
 }
 
-func PopulateActivityType(env environment.Environment, _ []blueprint.Course) {
+func PopulateActivityType(env environment.Environment) {
 	env.Log(environment.VerboseDebug, "-> Retrieving a list of all activities\n")
 	file, err := ioutil.ReadFile(activityPathFile)
 	var activityList []string
 	if err != nil {
 		env.Log(environment.VerboseDebug, "No activity found. Let's update the resources.\n")
-		UpdateActivityList(env, nil)
+		UpdateActivityList(env)
 		env.Log(environment.VerboseDebug, "List created, let's retry...\n")
-		PopulateActivityType(env, nil)
+		PopulateActivityType(env)
 		return
 	}
 	var actList blueprint.Activity
@@ -62,7 +62,7 @@ func PopulateActivityType(env environment.Environment, _ []blueprint.Course) {
 	env.Logf(environment.VerboseDebug, "-> %v activity has been found\n", len(activityList))
 }
 
-func UpdateActivityList(env environment.Environment, _ []blueprint.Course) {
+func UpdateActivityList(env environment.Environment) {
 	env.Log(environment.VerboseDebug, "Updating the activity list, it might take some time...\n")
 	update := false
 	count := 0

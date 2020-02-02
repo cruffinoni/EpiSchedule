@@ -1,12 +1,17 @@
 package planning
 
 import (
-	"github.com/Dayrion/EpiSchedule/src/blueprint"
+	"github.com/Dayrion/EpiSchedule/src/endpoint/course"
 	"github.com/Dayrion/EpiSchedule/src/environment"
 	"github.com/Dayrion/EpiSchedule/src/utils"
+	"log"
 )
 
-func ShowIncomingEvents(env environment.Environment, courseList []blueprint.Course) {
+func ShowIncomingEvents(env environment.Environment) {
+	courseList, err := course.GetAllCourses(env)
+	if err != nil {
+		log.Fatalf("An error occured during retrieving all courses: %v\n", err.Error())
+	}
 	env.Log(environment.VerboseSimple, "Show all incoming events...\n")
 	for _, course := range courseList {
 		env.Logf(environment.VerboseSimple, environment.ColorCyan+"~ Show incoming events for module named '%v'\n",

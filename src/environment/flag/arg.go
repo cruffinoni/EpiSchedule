@@ -1,7 +1,6 @@
 package flag
 
 import (
-	"github.com/Dayrion/EpiSchedule/src/blueprint"
 	"github.com/Dayrion/EpiSchedule/src/environment"
 )
 
@@ -16,7 +15,7 @@ const (
 	boolDefaultValue   = false
 )
 
-type HandlerType func(environment.Environment, []blueprint.Course)
+type HandlerType func(environment.Environment)
 type PreHandlerType func(*environment.Environment)
 
 type ProgArg struct {

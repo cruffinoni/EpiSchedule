@@ -64,6 +64,7 @@ package environment
 //	ActivityEvent:       activityColorEvent,
 //}
 
+// map [activityName] colorName
 var AvailableActivity = make(map[string]string)
 
 func ActivityToStringArray() []string {

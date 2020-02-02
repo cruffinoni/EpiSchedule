@@ -62,7 +62,11 @@ func checkAllActivitiesFromModule(env environment.Environment, course blueprint.
 	}
 }
 
-func ShowNotRegisteredModuleAndActivities(env environment.Environment, courses []blueprint.Course) {
+func ShowNotRegisteredModuleAndActivities(env environment.Environment) {
+	courses, err := GetAllCourses(env)
+	if err != nil {
+		log.Fatalf("An error occured during retrieving all courses: %v\n", err.Error())
+	}
 	if env.GetVerboseLevel() < environment.VerboseSimple {
 		return
 	}

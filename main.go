@@ -1,15 +1,12 @@
 package main
 
 import (
-	"fmt"
-	"github.com/Dayrion/EpiSchedule/src/credits"
 	"github.com/Dayrion/EpiSchedule/src/endpoint/course"
 	"github.com/Dayrion/EpiSchedule/src/endpoint/planning"
 	"github.com/Dayrion/EpiSchedule/src/endpoint/reception"
 	"github.com/Dayrion/EpiSchedule/src/environment"
 	"github.com/Dayrion/EpiSchedule/src/environment/flag"
 	"github.com/Dayrion/EpiSchedule/src/introspect"
-	"log"
 	"os"
 )
 
@@ -35,7 +32,6 @@ func setUpCommands(env *environment.Environment) {
 
 	flag.SetHandlerToCmd("show", planning.ShowIncomingEvents)
 	flag.SetUpPreHandler("show", func(env *environment.Environment) {
-		fmt.Printf("Going right to prehanlder show\n");
 		env.SetUpCalendar()
 		env.AddAutoRegisterCalendarActivity(environment.ActivityToStringArray()...)
 	})
@@ -52,13 +48,8 @@ func main() {
 	env := environment.NewEnvironment()
 	env.SetVerboseLevel(environment.VerboseDebug)
 	env.User.Semester, env.User.Credits = reception.GetCurrentUserSemesterAndCredits(env)
-	allCourses, err := course.GetAllCourses(env)
-	if err != nil {
-		log.Fatalf("An error occured during retrieving all courses: %v\n", err.Error())
-	}
-	credits.DisplayCreditsInfo(env)
-	introspect.PopulateActivityType(env, allCourses)
+	introspect.PopulateActivityType(env)
 	setUpCommands(&env)
 	cmd := flag.RetrieveCommand(&env, os.Args)
-	cmd.ExecuteHandlers(&env, allCourses)
+	cmd.ExecuteHandlers(&env)
 }

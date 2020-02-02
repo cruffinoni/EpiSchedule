@@ -44,8 +44,9 @@ func NewEnvironment() Environment {
 	if env.authentication == "" {
 		log.Fatal("Unable to retrieve autologin link from env\n")
 	}
+	env.Log(VerboseDebug, "Testing autologin link.\n")
 	testConnection(env)
-	fmt.Print("Initialization done...\n")
+	env.Log(VerboseDebug, "Initialization successful.\n")
 	return env
 }
 
@@ -53,7 +54,9 @@ func (env *Environment) SetUpCalendar() {
 	if env.googleCalendar != nil {
 		return
 	}
+	env.Logf(VerboseDebug, "Creating %v Google Calendar if needed.\n", ProjectName)
 	env.createCalendarService()
+	env.Logf(VerboseDebug, "Retrieve registered activities in %v's Google Calendar.\n", ProjectName)
 	env.retrieveCalendar()
 	env.listRegisteredEvents()
 }
