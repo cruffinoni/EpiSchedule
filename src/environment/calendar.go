@@ -27,7 +27,7 @@ const (
 type GoogleCalendar struct {
 	service          *calendar.Service
 	internalCalendar *calendar.Calendar
-	registeredEvents map[string]int
+	registeredEvents map[string] blueprint.CalendarEvent
 }
 
 // Request a token from the web, then returns the retrieved token.
@@ -104,7 +104,7 @@ func refreshToken(env Environment, config *oauth2.Config) *oauth2.Token {
 
 func (env *Environment) createCalendarService() {
 	env.googleCalendar = &GoogleCalendar{
-		registeredEvents: make(map[string]int),
+		registeredEvents: make(map[string]blueprint.CalendarEvent),
 	}
 	credFile, err := ioutil.ReadFile(googleFolder + "credentials.json")
 	if err != nil {
@@ -184,13 +184,39 @@ func (env *Environment) listRegisteredEvents() {
 		if event.Summary == "" {
 			continue
 		}
-		env.googleCalendar.registeredEvents[event.Summary]++
+		env.googleCalendar.registeredEvents[event.Summary] = event
+	}
+}
+
+func (env Environment) RemoveEvent(title string) {
+	if event, ok := env.googleCalendar.registeredEvents[title]; !ok {
+		env.Logf(VerboseDebug, "Impossible to remove: '%v'. The event doesn't exists.\n", title)
+		return
+	} else {
+		r := env.googleCalendar.service.Events.Delete(env.googleCalendar.internalCalendar.Id,
+			event.ID)
+		err := r.Do()
+		if err == nil {
+			env.Errorf("Unable to delete the event: %v - Bad return from Google\n", title)
+		}
 	}
 }
 
 func (env Environment) AddEvent(activity blueprint.CourseActivity) {
-	if env.googleCalendar.registeredEvents[activity.Title] > 0 {
-		env.Logf(VerboseSimple, ColorMagenta+"	> The event '%v' is already registered in the calendar.\n", activity.Title)
+	if e, ok := env.googleCalendar.registeredEvents[activity.Title]; ok {
+		startDate, err := utils.GetCESTDateFromString(activity.Events[0].Begin)
+		if err != nil {
+			log.Fatal(err.Error())
+		}
+		//log.Printf("Date are not even: %+v & %+v = %v\n", startDate, e.Start.DateTime, activity.Events[0].Begin)
+		if utils.IsDateEven(startDate, e.Start.DateTime) {
+			env.Logf(VerboseSimple, ColorMagenta+"	> The event '%v' is already registered in the calendar.\n", activity.Title)
+			return
+		} else {
+			env.Logf(VerboseSimple, ColorMagenta+"	> The event '%v' is already registered but the date has changed.\n", activity.Title)
+			//env.RemoveEvent(activity.Title)
+			//env.Log(VerboseSimple, ColorMagenta+"	> Event deleted from the calendar. A new will be added with the updated hours.\n")
+		}
 		return
 	}
 	extractedLocation := strings.Split(activity.Events[0].Location, "/")
@@ -228,7 +254,12 @@ func (env Environment) AddEvent(activity blueprint.CourseActivity) {
 	if err != nil {
 		log.Fatalf("Unable to insert an event: '%v'\n", err.Error())
 	}
-	env.googleCalendar.registeredEvents[activity.Title]++
+	env.googleCalendar.registeredEvents[activity.Title] = blueprint.CalendarEvent {
+		Start: struct{ DateTime time.Time `json:"dateTime"`} {
+			DateTime: time.Now(),
+		},
+		Summary: activity.Title,
+	}
 	env.Log(VerboseSimple, ColorBlue+"	> Activity successfully added.\n")
 
 }

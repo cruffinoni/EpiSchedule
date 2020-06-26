@@ -41,20 +41,24 @@ func printProgramUsage(env environment.Environment, optional ...string) {
 	os.Exit(1)
 }
 
-func printAllCmdArgs(env environment.Environment, cmdName string, cmd ProgCmd) {
-	// TODO: List les arguments
+func printAllCmdArgs(env environment.Environment, cmdName string, cmd *ProgCmd) {
 	env.Errorf("Usage of %v:\n\t./%v %v\n",
-		environment.ProjectName, strings.ToLower(environment.ProjectName), cmdName, cmd.Args)
+		environment.ProjectName, strings.ToLower(environment.ProjectName), cmdName)
+	for _, arg := range cmd.Args {
+		env.Errorf("\t%v: %v\n", arg.Name, arg.Description)
+		env.Errorf("\tOptional: %v\n", arg.DefaultValue == nil)
+	}
+	os.Exit(0)
 }
 
 func RetrieveCommand(env *environment.Environment, args []string) *ProgCmd {
-	if len(args) < 2 || (len(args) > 1) {
+	if len(args) < 2 {
 		printProgramUsage(*env)
 	}
 	for cmdName, cmd := range cmdArg {
 		if args[1] == cmdName {
-			if (args[1] == "-h" || args[1] == "--help") {
-				printProgramUsage(*env, cmd)
+			if args[1] == "-h" || args[1] == "--help" {
+				printAllCmdArgs(*env, cmdName, cmd)
 			}
 			argCmdSet := flag.NewFlagSet(cmdName, flag.ExitOnError)
 			for _, arg := range cmd.Args {

@@ -24,8 +24,13 @@ func checkAllActivitiesFromModule(env environment.Environment, course blueprint.
 	for _, activity := range course.Details.Activities {
 		if len(activity.Events) == 0 {
 			if activity.TypeTitle == "Project" && utils.IsDateBeforeNow(activity.End) {
-				env.Logf(environment.VerboseSimple, environment.ColorMagenta+"	!< You are not registered to the main project (named '%v') ! You may register it as soon as possible. The project start at %v.\n",
-					activity.Title, activity.Begin)
+				if utils.IsDateAfterNow(activity.Begin) && env.IsAutoRegisteredActivity(activity.TypeTitle) {
+					env.Logf(environment.VerboseSimple, environment.ColorCyan+"	<~ I'll register you to the project id %v\n", activity.ActivityCode)
+					RegisterUserToAnActivity(env, course, activity.ActivityCode)
+				} else {
+					env.Logf(environment.VerboseSimple, environment.ColorMagenta+"	!< You are not registered to the main project (named '%v') ! You may register it as soon as possible. The project start at %v.\n",
+						activity.Title, activity.Begin)
+				}
 			} else if utils.IsDateBeforeNow(activity.Begin) && (activity.EndRegister == "" || !isAbleToRegister(activity)) {
 				env.Logf(environment.VerboseSimple, environment.ColorBrightYellow+"	!- You are not registered to [%v] but the activity begin to be active at %v. You will be able to register as of this date.\n",
 					activity.Title, activity.Begin)
@@ -86,7 +91,6 @@ func ShowNotRegisteredModuleAndActivities(env environment.Environment) {
 func getCourseDetails(env environment.Environment, course blueprint.CourseSummary) blueprint.CourseDetails {
 	var userCourse blueprint.CourseDetails
 	detailsEndpoint := fmt.Sprintf(blueprint.CourseDetailsEndpoint, course.Scolaryear, course.Code, course.Codeinstance)
-	log.Printf("-> Endpoint: %v\n", detailsEndpoint);
 	if response, err := http.Get(blueprint.EpitechStartPoint + env.GetAuthentication() + detailsEndpoint); err != nil {
 		log.Fatal("Invalid response: " + err.Error())
 	} else if body, err := ioutil.ReadAll(response.Body); err != nil {

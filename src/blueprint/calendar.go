@@ -30,40 +30,42 @@ type CalendarList struct {
 	NextSyncToken string `json:"nextSyncToken"`
 }
 
+type CalendarEvent struct {
+	Created time.Time `json:"created"`
+	Creator struct {
+		Email string `json:"email"`
+	} `json:"creator"`
+	Description string `json:"description,omitempty"`
+	End         struct {
+		DateTime time.Time `json:"dateTime"`
+	} `json:"end"`
+	Etag      string `json:"etag"`
+	HTMLLink  string `json:"htmlLink"`
+	ICalUID   string `json:"iCalUID"`
+	ID        string `json:"id"`
+	Kind      string `json:"kind"`
+	Location  string `json:"location,omitempty"`
+	Organizer struct {
+		DisplayName string `json:"displayName"`
+		Email       string `json:"email"`
+		Self        bool   `json:"self"`
+	} `json:"organizer"`
+	Reminders struct {
+		UseDefault bool `json:"useDefault"`
+	} `json:"reminders"`
+	Start struct {
+		DateTime time.Time `json:"dateTime"`
+	} `json:"start"`
+	Status  string    `json:"status"`
+	Summary string    `json:"summary,omitempty"`
+	Updated time.Time `json:"updated"`
+}
+
 type CalendarEventList struct {
 	AccessRole  string `json:"accessRole"`
 	Description string `json:"description"`
 	Etag        string `json:"etag"`
-	Items       []struct {
-		Created time.Time `json:"created"`
-		Creator struct {
-			Email string `json:"email"`
-		} `json:"creator"`
-		Description string `json:"description,omitempty"`
-		End         struct {
-			DateTime time.Time `json:"dateTime"`
-		} `json:"end"`
-		Etag      string `json:"etag"`
-		HTMLLink  string `json:"htmlLink"`
-		ICalUID   string `json:"iCalUID"`
-		ID        string `json:"id"`
-		Kind      string `json:"kind"`
-		Location  string `json:"location,omitempty"`
-		Organizer struct {
-			DisplayName string `json:"displayName"`
-			Email       string `json:"email"`
-			Self        bool   `json:"self"`
-		} `json:"organizer"`
-		Reminders struct {
-			UseDefault bool `json:"useDefault"`
-		} `json:"reminders"`
-		Start struct {
-			DateTime time.Time `json:"dateTime"`
-		} `json:"start"`
-		Status  string    `json:"status"`
-		Summary string    `json:"summary,omitempty"`
-		Updated time.Time `json:"updated"`
-	} `json:"items"`
+	Items       []CalendarEvent `json:"items"`
 	Kind          string    `json:"kind"`
 	NextSyncToken string    `json:"nextSyncToken"`
 	Summary       string    `json:"summary"`
