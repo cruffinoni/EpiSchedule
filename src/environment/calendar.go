@@ -142,7 +142,7 @@ func (env *Environment) retrieveCalendar() {
 	calendarListService := env.googleCalendar.service.CalendarList.List()
 	list, err := calendarListService.Do()
 	if err != nil {
-		log.Fatal("Unable to do calendar list. EpiSchedule has no right to list your calendars\n")
+		log.Fatalf("Unable to do calendar list. EpiSchedule has no right to list your calendars: %v\n", err.Error())
 	}
 	marshalCalendar, err := list.MarshalJSON()
 	if err != nil {
