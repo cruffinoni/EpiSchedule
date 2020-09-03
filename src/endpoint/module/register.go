@@ -20,11 +20,11 @@ func RegisterModuleToCalendar(env environment.Environment) {
 			env.Log(environment.VerboseSimple, "'%v' has no active project\n", c.Summary.Title)
 			continue
 		}
-		for _, d := range c.Details.Activities {
-			if d.TypeTitle == "Project" {
+		for _, a := range c.Details.Activities {
+			if a.TypeTitle == "Project" {
 				env.Logf(environment.VerboseSimple, "Project '%v' added. It starts at %v and end at %v\n",
-					d.Title, d.Begin, d.End)
-				env.AddModule(c.Summary, d)
+					a.Title, a.Begin, a.End)
+				env.AddModule(c.Summary, a)
 				break
 			}
 		}
