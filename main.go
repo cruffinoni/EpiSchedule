@@ -2,6 +2,7 @@ package main
 
 import (
 	"github.com/Dayrion/EpiSchedule/src/endpoint/course"
+	"github.com/Dayrion/EpiSchedule/src/endpoint/module"
 	"github.com/Dayrion/EpiSchedule/src/endpoint/planning"
 	"github.com/Dayrion/EpiSchedule/src/endpoint/reception"
 	"github.com/Dayrion/EpiSchedule/src/environment"
@@ -41,6 +42,11 @@ func setUpCommands(env *environment.Environment) {
 		DefaultValue: true,
 		Name:         "special-semester",
 		Description:  "(Optional) Register the semester 0 as a valid one. It will give more type.",
+	})
+	flag.SetHandlerToCmd("module", module.RegisterModuleToCalendar)
+	flag.SetUpPreHandler("module", func(e *environment.Environment) {
+		e.SetUpCalendar()
+		env.AddAutoRegisterCalendarActivity(environment.ActivityToStringArray()...)
 	})
 }
 

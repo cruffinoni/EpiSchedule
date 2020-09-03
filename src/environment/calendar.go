@@ -11,6 +11,7 @@ import (
 	"google.golang.org/api/option"
 	"io/ioutil"
 	"log"
+	"math/rand"
 	"os"
 	"os/exec"
 	"runtime"
@@ -27,7 +28,7 @@ const (
 type GoogleCalendar struct {
 	service          *calendar.Service
 	internalCalendar *calendar.Calendar
-	registeredEvents map[string] blueprint.CalendarEvent
+	registeredEvents map[string]blueprint.CalendarEvent
 }
 
 // Request a token from the web, then returns the retrieved token.
@@ -237,13 +238,13 @@ func (env Environment) AddEvent(activity blueprint.CourseActivity) {
 			ColorId:          color,
 			Description:      activity.Description,
 			End: &calendar.EventDateTime{
-				DateTime: utils.DateToRFC3339(activity.Events[0].End),
+				DateTime: utils.FullDateToRFC3339(activity.Events[0].End),
 				TimeZone: defaultTimeZone,
 			},
 			Kind:     "calendar#event",
 			Location: locationName,
 			Start: &calendar.EventDateTime{
-				DateTime: utils.DateToRFC3339(activity.Events[0].Begin),
+				DateTime: utils.FullDateToRFC3339(activity.Events[0].Begin),
 				TimeZone: defaultTimeZone,
 			},
 			Status:       "confirmed",
@@ -254,12 +255,38 @@ func (env Environment) AddEvent(activity blueprint.CourseActivity) {
 	if err != nil {
 		log.Fatalf("Unable to insert an event: '%v'\n", err.Error())
 	}
-	env.googleCalendar.registeredEvents[activity.Title] = blueprint.CalendarEvent {
-		Start: struct{ DateTime time.Time `json:"dateTime"`} {
+	env.googleCalendar.registeredEvents[activity.Title] = blueprint.CalendarEvent{
+		Start: struct {
+			DateTime time.Time `json:"dateTime"`
+		}{
 			DateTime: time.Now(),
 		},
 		Summary: activity.Title,
 	}
 	env.Log(VerboseSimple, ColorBlue+"	> Activity successfully added.\n")
+}
 
+func (env Environment) AddModule(module blueprint.CourseSummary, project blueprint.CourseActivity) {
+	_, err := env.googleCalendar.service.Events.Insert(env.googleCalendar.internalCalendar.Id,
+		&calendar.Event{
+			AnyoneCanAddSelf: false,
+			ColorId:          fmt.Sprintf("%v", rand.Intn(10)+1),
+			End: &calendar.EventDateTime{
+				DateTime: utils.FullDateToRFC3339(project.End),
+				TimeZone: defaultTimeZone,
+			},
+			Kind: "calendar#event",
+			Start: &calendar.EventDateTime{
+				DateTime: utils.FullDateToRFC3339(project.Begin),
+				TimeZone: defaultTimeZone,
+			},
+			Status:       "confirmed",
+			Summary:      project.Title,
+			Transparency: "opaque",
+			Visibility:   "private",
+			Description:  fmt.Sprintf("Module: %v\n%v", module.Title, project.Description),
+		}).Do()
+	if err != nil {
+		log.Fatalf("Unable to insert an event: '%v'\n", err.Error())
+	}
 }

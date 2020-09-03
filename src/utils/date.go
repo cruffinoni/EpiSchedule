@@ -37,15 +37,15 @@ func IsDateBeforeNow(date string) bool {
 	return !IsDateAfterNow(date)
 }
 
-func DateToRFC3339(strDate string) string {
+func FullDateToRFC3339(strDate string) string {
 	const layout = "2006-01-02 15:04:05 -0700 UTC"
 	strDate = strDate + " +0100 UTC"
 	if date, err := time.Parse(layout, strDate); err != nil {
 		log.Fatal("Unable to parse a date.\n")
+		return ""
 	} else {
 		return date.Format(time.RFC3339)
 	}
-	return ""
 }
 
 func IsDateEven(a time.Time, b time.Time) bool {
