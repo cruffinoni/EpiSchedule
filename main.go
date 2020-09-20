@@ -46,7 +46,6 @@ func setUpCommands(env *environment.Environment) {
 	flag.SetHandlerToCmd("module", module.RegisterModuleToCalendar)
 	flag.SetUpPreHandler("module", func(e *environment.Environment) {
 		e.SetUpCalendar()
-		env.AddAutoRegisterCalendarActivity(environment.ActivityToStringArray()...)
 	})
 }
 
