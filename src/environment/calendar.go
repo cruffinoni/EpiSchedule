@@ -11,7 +11,6 @@ import (
 	"google.golang.org/api/option"
 	"io/ioutil"
 	"log"
-	"math/rand"
 	"os"
 	"os/exec"
 	"runtime"
@@ -267,10 +266,14 @@ func (env Environment) AddEvent(activity blueprint.CourseActivity) {
 }
 
 func (env Environment) AddModule(module blueprint.CourseSummary, project blueprint.CourseActivity) {
+	if _, ok := env.googleCalendar.registeredEvents[project.Title]; ok {
+		env.Logf(VerboseSimple, ColorCyan+"Module %v is already there\n", project.Title)
+		return
+	}
 	_, err := env.googleCalendar.service.Events.Insert(env.googleCalendar.internalCalendar.Id,
 		&calendar.Event{
 			AnyoneCanAddSelf: false,
-			ColorId:          fmt.Sprintf("%v", rand.Intn(10)+1),
+			ColorId:          fmt.Sprintf("%v", project.Title[0] % 10),
 			End: &calendar.EventDateTime{
 				DateTime: utils.FullDateToRFC3339(project.End),
 				TimeZone: defaultTimeZone,
