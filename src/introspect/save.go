@@ -2,9 +2,9 @@ package introspect
 
 import (
 	"encoding/json"
-	"github.com/Dayrion/EpiSchedule/src/blueprint"
-	"github.com/Dayrion/EpiSchedule/src/endpoint/course"
-	"github.com/Dayrion/EpiSchedule/src/environment"
+	"github.com/cruffinoni/EpiSchedule/src/blueprint"
+	"github.com/cruffinoni/EpiSchedule/src/endpoint/course"
+	"github.com/cruffinoni/EpiSchedule/src/environment"
 	"io/ioutil"
 	"log"
 	"math/rand"

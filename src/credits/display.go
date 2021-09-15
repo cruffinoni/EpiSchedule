@@ -1,7 +1,7 @@
 package credits
 
 import (
-	"github.com/Dayrion/EpiSchedule/src/environment"
+	"github.com/cruffinoni/EpiSchedule/src/environment"
 )
 
 func DisplayCreditsInfo(env environment.Environment) {

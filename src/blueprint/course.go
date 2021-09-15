@@ -1,7 +1,7 @@
 package blueprint
 
 const (
-	CourseDataEndpoint    = "/course/filter?format=json&location[]=FR&location[]=FR%2FSTG&course[]=bachelor%2Fclassic&scolaryear[]=2020"
+	CourseDataEndpoint    = "/course/filter?format=json&location[]=FR&location[]=FR%2FSTG&course[]=bachelor%2Fclassic&scolaryear[]=2021" // The year should be automatic
 	CourseDetailsEndpoint = "/module/%v/%v/%v/?format=json"
 	EpitechStartPoint     = "https://intra.epitech.eu/"
 )

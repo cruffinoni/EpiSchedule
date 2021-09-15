@@ -4,9 +4,9 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/Dayrion/EpiSchedule/src/blueprint"
-	"github.com/Dayrion/EpiSchedule/src/environment"
-	"github.com/Dayrion/EpiSchedule/src/utils"
+	"github.com/cruffinoni/EpiSchedule/src/blueprint"
+	"github.com/cruffinoni/EpiSchedule/src/environment"
+	"github.com/cruffinoni/EpiSchedule/src/utils"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -67,7 +67,7 @@ func checkAllActivitiesFromModule(env environment.Environment, course blueprint.
 	}
 }
 
-func ShowNotRegisteredModuleAndActivities(env environment.Environment) {
+func ShowAndRegisterToActivities(env environment.Environment) {
 	courses, err := GetAllCourses(env)
 	if err != nil {
 		log.Fatalf("An error occured during retrieving all courses: %v\n", err.Error())
@@ -77,12 +77,12 @@ func ShowNotRegisteredModuleAndActivities(env environment.Environment) {
 	}
 	for _, course := range courses {
 		if course.Details.Opened != "1" {
-			env.Logf(environment.VerboseMedium, "The course '%v' is in your semester but it's closed\n", course.Details.Title)
+			env.Logf(environment.VerboseMedium, environment.ColorWhite+"The course '%v' is in your semester but it's closed\n", course.Details.Title)
 		}
 		if course.Details.StudentRegistered == 0 {
-			env.Logf(environment.VerboseSimple, "! You seems not to be registered to the module: %v\n", course.Details.Title)
+			env.Logf(environment.VerboseSimple, environment.ColorRed+"! You seems not to be registered to the module: %v\n", course.Details.Title)
 		} else {
-			env.Logf(environment.VerboseSimple, "+ You are registered to the module: %v\n", course.Details.Title)
+			env.Logf(environment.VerboseSimple, environment.ColorGreen+"+ You are registered to the module: %v\n", course.Details.Title)
 			checkAllActivitiesFromModule(env, course)
 		}
 	}
@@ -104,7 +104,7 @@ func getCourseDetails(env environment.Environment, course blueprint.CourseSummar
 func createCoursesList(env environment.Environment, allCourses []blueprint.CourseSummary) []blueprint.Course {
 	userCourse := make([]blueprint.Course, 0)
 	for _, course := range allCourses {
-		if course.Semester < env.User.Semester && (env.User.Semester != 0 && !env.Flag.SpecialSemester) {
+		if course.Semester < env.User.Semester && env.User.Semester != 0 && !env.Flag.SpecialSemester {
 			continue
 		}
 		userCourse = append(userCourse, blueprint.Course{

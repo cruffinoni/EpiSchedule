@@ -1,7 +1,7 @@
 package flag
 
 import (
-	"github.com/Dayrion/EpiSchedule/src/environment"
+	"github.com/cruffinoni/EpiSchedule/src/environment"
 )
 
 const (

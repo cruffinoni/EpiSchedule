@@ -124,87 +124,79 @@ const (
 //
 //}
 
-type Reception struct {
+type ReceptionSingle struct {
 	IP    string `json:"ip"`
 	Board struct {
-		Projets []struct {
-			Title           string `json:"title"`
-			TitleLink       string `json:"title_link"`
-			TimelineStart   string `json:"timeline_start"`
-			TimelineEnd     string `json:"timeline_end"`
-			TimelineBarre   string `json:"timeline_barre"`
-			DateInscription interface{}   `json:"date_inscription"`
-			IDActivite      string `json:"id_activite"`
-			SoutenanceName  bool   `json:"soutenance_name"`
-			SoutenanceLink  bool   `json:"soutenance_link"`
-			SoutenanceDate  bool   `json:"soutenance_date"`
-			SoutenanceSalle bool   `json:"soutenance_salle"`
-		} `json:"projets"`
-		Notes []struct {
-			Title     string `json:"title"`
-			TitleLink string `json:"title_link"`
-			Note      string `json:"note"`
-			Noteur    string `json:"noteur"`
-		} `json:"notes"`
+		Projets   []interface{} `json:"projets"`
+		Notes     []interface{} `json:"notes"`
 		Susies    []interface{} `json:"susies"`
-		Activites []struct {
-			Title           string      `json:"title"`
-			Module          string      `json:"module"`
-			ModuleLink      string      `json:"module_link"`
-			ModuleCode      string      `json:"module_code"`
-			TitleLink       string      `json:"title_link"`
-			TimelineStart   string      `json:"timeline_start"`
-			TimelineEnd     string      `json:"timeline_end"`
-			TimelineBarre   string      `json:"timeline_barre"`
-			DateInscription interface{}        `json:"date_inscription"`
-			Salle           string      `json:"salle"`
-			Intervenant     string      `json:"intervenant"`
-			Token           interface{} `json:"token"`
-			TokenLink       string      `json:"token_link"`
-			RegisterLink    string      `json:"register_link"`
-		} `json:"activites"`
-		Modules []struct {
+		Activites []interface{} `json:"activites"`
+		Modules   []struct {
 			Title           string `json:"title"`
 			TitleLink       string `json:"title_link"`
 			TimelineStart   string `json:"timeline_start"`
 			TimelineEnd     string `json:"timeline_end"`
 			TimelineBarre   string `json:"timeline_barre"`
-			DateInscription interface{} `json:"date_inscription"`
+			DateInscription string `json:"date_inscription"`
 		} `json:"modules"`
 		Stages  []interface{} `json:"stages"`
 		Tickets []interface{} `json:"tickets"`
 	} `json:"board"`
-	History []struct {
-		Title string `json:"title"`
-		User  struct {
-			Picture string `json:"picture"`
-			Title   string `json:"title"`
-			URL     string `json:"url"`
-		} `json:"user"`
-		Content    string `json:"content"`
-		Date       string `json:"date"`
-		ID         string `json:"id"`
-		Visible    string `json:"visible"`
-		IDActivite string `json:"id_activite"`
-		Class      string `json:"class"`
-	} `json:"history"`
-	Infos struct {
+	History []interface{} `json:"history"`
+	Infos   struct {
 		Location string `json:"location"`
 	} `json:"infos"`
-	Current []struct {
+	Current struct {
+		ActiveLog    int    `json:"active_log"`
 		CreditsMin   string `json:"credits_min"`
 		CreditsNorm  string `json:"credits_norm"`
 		CreditsObj   string `json:"credits_obj"`
 		NslogMin     string `json:"nslog_min"`
 		NslogNorm    string `json:"nslog_norm"`
-		Credits      string `json:"credits"`
-		Grade        string `json:"grade"`
-		Cycle        string `json:"cycle"`
-		CodeModule   string `json:"code_module"`
-		CurrentCycle string `json:"current_cycle"`
 		SemesterCode string `json:"semester_code"`
 		SemesterNum  string `json:"semester_num"`
-		ActiveLog    string `json:"active_log"`
+		Achieved     int    `json:"achieved"`
+		Failed       int    `json:"failed"`
+		Inprogress   int    `json:"inprogress"`
+	} `json:"current"`
+}
+
+type Reception struct {
+	IP    string `json:"ip"`
+	Board struct {
+		Projets   []interface{} `json:"projets"`
+		Notes     []interface{} `json:"notes"`
+		Susies    []interface{} `json:"susies"`
+		Activites []interface{} `json:"activites"`
+		Modules   []struct {
+			Title           string `json:"title"`
+			TitleLink       string `json:"title_link"`
+			TimelineStart   string `json:"timeline_start"`
+			TimelineEnd     string `json:"timeline_end"`
+			TimelineBarre   string `json:"timeline_barre"`
+			DateInscription string `json:"date_inscription"`
+		} `json:"modules"`
+		Stages  []interface{} `json:"stages"`
+		Tickets []interface{} `json:"tickets"`
+	} `json:"board"`
+	History []interface{} `json:"history"`
+	Infos   struct {
+		Location string `json:"location"`
+	} `json:"infos"`
+	Current []struct {
+		CreditsMin   string      `json:"credits_min"`
+		CreditsNorm  string      `json:"credits_norm"`
+		CreditsObj   string      `json:"credits_obj"`
+		NslogMin     string      `json:"nslog_min"`
+		NslogNorm    string      `json:"nslog_norm"`
+		Credits      string      `json:"credits"`
+		Grade        string      `json:"grade"`
+		Cycle        string      `json:"cycle"`
+		CodeModule   string      `json:"code_module"`
+		CurrentCycle string      `json:"current_cycle"`
+		SemesterCode string      `json:"semester_code"`
+		SemesterNum  string      `json:"semester_num"`
+		ActiveLog    interface{} `json:"active_log"`
 	} `json:"current"`
 }
 

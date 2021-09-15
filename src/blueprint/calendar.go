@@ -62,13 +62,13 @@ type CalendarEvent struct {
 }
 
 type CalendarEventList struct {
-	AccessRole  string `json:"accessRole"`
-	Description string `json:"description"`
-	Etag        string `json:"etag"`
-	Items       []CalendarEvent `json:"items"`
-	Kind          string    `json:"kind"`
-	NextSyncToken string    `json:"nextSyncToken"`
-	Summary       string    `json:"summary"`
-	TimeZone      string    `json:"timeZone"`
-	Updated       time.Time `json:"updated"`
+	AccessRole    string          `json:"accessRole"`
+	Description   string          `json:"description"`
+	Etag          string          `json:"etag"`
+	Items         []CalendarEvent `json:"items"`
+	Kind          string          `json:"kind"`
+	NextSyncToken string          `json:"nextSyncToken"`
+	Summary       string          `json:"summary"`
+	TimeZone      string          `json:"timeZone"`
+	Updated       time.Time       `json:"updated"`
 }

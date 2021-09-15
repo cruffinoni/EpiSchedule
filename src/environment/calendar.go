@@ -3,8 +3,8 @@ package environment
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/Dayrion/EpiSchedule/src/blueprint"
-	"github.com/Dayrion/EpiSchedule/src/utils"
+	"github.com/cruffinoni/EpiSchedule/src/blueprint"
+	"github.com/cruffinoni/EpiSchedule/src/utils"
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/google"
 	"google.golang.org/api/calendar/v3"

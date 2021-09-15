@@ -2,9 +2,9 @@ package introspect
 
 import (
 	"fmt"
-	"github.com/Dayrion/EpiSchedule/src/blueprint"
-	"github.com/Dayrion/EpiSchedule/src/credits"
-	"github.com/Dayrion/EpiSchedule/src/environment"
+	"github.com/cruffinoni/EpiSchedule/src/blueprint"
+	"github.com/cruffinoni/EpiSchedule/src/credits"
+	"github.com/cruffinoni/EpiSchedule/src/environment"
 )
 
 func listActivity(courses []blueprint.Course) map[string]int {

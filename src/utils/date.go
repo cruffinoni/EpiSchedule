@@ -14,6 +14,15 @@ func GetDateFromString(strDate string) (time.Time, error) {
 	}
 }
 
+func GetCalendarDateFromString(strDate string) (time.Time, error) {
+	const layout = "2006-01-02"
+	if date, err := time.Parse(layout, strDate); err != nil {
+		return time.Time{}, err
+	} else {
+		return date, err
+	}
+}
+
 func GetCESTDateFromString(strDate string) (time.Time, error) {
 	const layout = "2006-01-02 15:04:05 -0700 UTC"
 	strDate = strDate + " +0100 UTC"

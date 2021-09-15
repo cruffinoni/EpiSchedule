@@ -3,7 +3,7 @@ package environment
 import (
 	"context"
 	"fmt"
-	"github.com/Dayrion/EpiSchedule/src/blueprint"
+	"github.com/cruffinoni/EpiSchedule/src/blueprint"
 	"log"
 	"net/http"
 )

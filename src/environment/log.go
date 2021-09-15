@@ -3,6 +3,7 @@ package environment
 import (
 	"fmt"
 	"log"
+	"time"
 )
 
 type VerboseLevel uint
@@ -33,12 +34,14 @@ func (env Environment) GetVerboseLevel() VerboseLevel {
 
 func (env Environment) Logf(level VerboseLevel, msg string, format ...interface{}) {
 	if env.verbose >= level {
+		msg = time.Now().Format(time.RFC3339) + " " + msg
 		fmt.Printf(msg+ColorReset, format...)
 	}
 }
 
 func (env Environment) Log(level VerboseLevel, msg ...interface{}) {
 	if env.verbose >= level {
+		fmt.Print(time.Now().Format(time.RFC3339) + " ")
 		fmt.Print(msg...)
 		fmt.Print(ColorReset)
 	}

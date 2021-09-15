@@ -1,18 +1,18 @@
 package main
 
 import (
-	"github.com/Dayrion/EpiSchedule/src/endpoint/course"
-	"github.com/Dayrion/EpiSchedule/src/endpoint/module"
-	"github.com/Dayrion/EpiSchedule/src/endpoint/planning"
-	"github.com/Dayrion/EpiSchedule/src/endpoint/reception"
-	"github.com/Dayrion/EpiSchedule/src/environment"
-	"github.com/Dayrion/EpiSchedule/src/environment/flag"
-	"github.com/Dayrion/EpiSchedule/src/introspect"
+	"github.com/cruffinoni/EpiSchedule/src/endpoint/course"
+	"github.com/cruffinoni/EpiSchedule/src/endpoint/module"
+	"github.com/cruffinoni/EpiSchedule/src/endpoint/planning"
+	"github.com/cruffinoni/EpiSchedule/src/endpoint/reception"
+	"github.com/cruffinoni/EpiSchedule/src/environment"
+	"github.com/cruffinoni/EpiSchedule/src/environment/flag"
+	"github.com/cruffinoni/EpiSchedule/src/introspect"
 	"os"
 )
 
 func setUpCommands(env *environment.Environment) {
-	flag.SetHandlerToCmd("register", course.ShowNotRegisteredModuleAndActivities)
+	flag.SetHandlerToCmd("register", course.ShowAndRegisterToActivities)
 	flag.SetUpPreHandler("register", func(env *environment.Environment) {
 		env.AddAutoRegisterActivity(environment.ActivityToStringArray()...)
 	})
@@ -33,6 +33,7 @@ func setUpCommands(env *environment.Environment) {
 
 	flag.SetHandlerToCmd("show", planning.ShowIncomingEvents)
 	flag.SetUpPreHandler("show", func(env *environment.Environment) {
+		env.Flag.SpecialSemester = true
 		env.SetUpCalendar()
 		env.AddAutoRegisterCalendarActivity(environment.ActivityToStringArray()...)
 	})
@@ -43,7 +44,12 @@ func setUpCommands(env *environment.Environment) {
 		Name:         "special-semester",
 		Description:  "(Optional) Register the semester 0 as a valid one. It will give more type.",
 	})
-	flag.SetHandlerToCmd("module", module.RegisterModuleToCalendar)
+	flag.SetHandlerToCmd("module-calendar", module.RegisterModuleToCalendar)
+	flag.SetUpPreHandler("module-calendar", func(e *environment.Environment) {
+		e.SetUpCalendar()
+	})
+
+	flag.SetHandlerToCmd("module", module.RegisterToModule)
 	flag.SetUpPreHandler("module", func(e *environment.Environment) {
 		e.SetUpCalendar()
 	})

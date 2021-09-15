@@ -2,8 +2,8 @@ package reception
 
 import (
 	"encoding/json"
-	"github.com/Dayrion/EpiSchedule/src/blueprint"
-	"github.com/Dayrion/EpiSchedule/src/environment"
+	"github.com/cruffinoni/EpiSchedule/src/blueprint"
+	"github.com/cruffinoni/EpiSchedule/src/environment"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -19,6 +19,19 @@ func getIntFromStr(number string) int {
 	return 0
 }
 
+func trySecondReceptionFormat(body []byte) (int, blueprint.Credits) {
+	var userReception blueprint.ReceptionSingle
+	if err := json.Unmarshal(body, &userReception); err != nil {
+		log.Printf("(Body): '%v'\n", string(body))
+		log.Fatal("Invalid unmarshal for both receptions: " + err.Error())
+	}
+	return getIntFromStr(userReception.Current.SemesterNum), blueprint.Credits{
+		Minimum:   getIntFromStr(userReception.Current.CreditsMin),
+		Aimed:     getIntFromStr(userReception.Current.CreditsNorm),
+		Objective: getIntFromStr(userReception.Current.CreditsObj),
+	}
+}
+
 func GetCurrentUserSemesterAndCredits(env environment.Environment) (int, blueprint.Credits) {
 	var userReception blueprint.Reception
 	if response, err := http.Get(blueprint.EpitechStartPoint + env.GetAuthentication() + blueprint.ReceptionEndpoint); err != nil {
@@ -26,8 +39,7 @@ func GetCurrentUserSemesterAndCredits(env environment.Environment) (int, bluepri
 	} else if body, err := ioutil.ReadAll(response.Body); err != nil {
 		log.Fatal("Invalid read: " + err.Error())
 	} else if err := json.Unmarshal(body, &userReception); err != nil {
-		log.Printf("(Body): '%v'\n", string(body))
-		log.Fatal("Invalid unmarshal: " + err.Error())
+		return trySecondReceptionFormat(body)
 	}
 	return getIntFromStr(userReception.Current[0].SemesterNum), blueprint.Credits{
 		Minimum:   getIntFromStr(userReception.Current[0].CreditsMin),

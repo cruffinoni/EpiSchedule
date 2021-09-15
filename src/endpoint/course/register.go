@@ -3,8 +3,8 @@ package course
 import (
 	"bytes"
 	"fmt"
-	"github.com/Dayrion/EpiSchedule/src/blueprint"
-	"github.com/Dayrion/EpiSchedule/src/environment"
+	"github.com/cruffinoni/EpiSchedule/src/blueprint"
+	"github.com/cruffinoni/EpiSchedule/src/environment"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -45,5 +45,33 @@ func RegisterUserToAnActivity(env environment.Environment, course blueprint.Cour
 		} else {
 			env.Log(environment.VerboseDebug, "			+ You have been successfully registered to this activity.\n")
 		}
+	}
+}
+
+func RegisterUserToModule(env environment.Environment, module blueprint.Course) {
+	urlHeader := blueprint.EpitechStartPoint + env.GetAuthentication()
+	url := urlHeader + fmt.Sprintf("/module/%v/%v/%v/register?format=json",
+		module.Details.Scolaryear, module.Details.Codemodule, module.Details.Codeinstance)
+	req, err := http.NewRequest("POST", url, bytes.NewBuffer([]byte("{}")))
+	if err != nil {
+		log.Fatalf("Err inside new request: '%v'\n", err.Error())
+	}
+	res, err := env.Client.Do(req)
+	if err != nil {
+		log.Fatalf("Unable to make http request: '%v'\n", err.Error())
+	}
+	if res.StatusCode != http.StatusOK {
+		env.Errorf("Wanted HTTP code %v but got %v during registering to the module id %v\n",
+			http.StatusOK, res.StatusCode, module.Details.Codemodule)
+		if body, err := ioutil.ReadAll(res.Body); err != nil {
+			env.Errorf("Unable to read the body of the request: '%v'\n", err.Error())
+		} else {
+			env.Errorf("Body: '%v'\n", string(body))
+		}
+		if env.GetVerboseLevel() == environment.VerboseDebug {
+			os.Exit(1)
+		}
+	} else {
+		env.Log(environment.VerboseDebug, environment.ColorGreen+"	+ You have been successfully registered to the module.\n")
 	}
 }

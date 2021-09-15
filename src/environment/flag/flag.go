@@ -2,7 +2,7 @@ package flag
 
 import (
 	"flag"
-	"github.com/Dayrion/EpiSchedule/src/environment"
+	"github.com/cruffinoni/EpiSchedule/src/environment"
 	"log"
 	"os"
 	"strings"
@@ -114,11 +114,11 @@ func RetrieveCommand(env *environment.Environment, args []string) *ProgCmd {
 
 func (cmd *ProgCmd) ExecuteHandlers(env *environment.Environment) {
 	if cmd.preHandler != nil {
-		env.Log(environment.VerboseDebug,"Executing pre-handler\n")
+		env.Log(environment.VerboseDebug, "Executing pre-handler\n")
 		cmd.preHandler(env)
 	}
 	if cmd.handler != nil {
-		env.Log(environment.VerboseDebug,"Executing handler\n")
+		env.Log(environment.VerboseDebug, "Executing handler\n")
 		cmd.handler(*env)
 	}
 }
