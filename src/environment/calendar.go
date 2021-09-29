@@ -2,6 +2,7 @@ package environment
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"github.com/cruffinoni/EpiSchedule/src/blueprint"
 	"github.com/cruffinoni/EpiSchedule/src/utils"
@@ -250,7 +251,7 @@ func (env Environment) AddEvent(activity blueprint.CourseActivity) {
 			Status:       "confirmed",
 			Summary:      activity.Title,
 			Transparency: "opaque",
-			Visibility:   "private",
+			Visibility:   "public",
 		}).Do()
 	if err != nil {
 		log.Fatalf("Unable to insert an event: '%v'\n", err.Error())
@@ -266,10 +267,13 @@ func (env Environment) AddEvent(activity blueprint.CourseActivity) {
 	env.Log(VerboseSimple, ColorBlue+"	> Activity successfully added.\n")
 }
 
-func (env Environment) AddModule(module blueprint.CourseSummary, project blueprint.CourseActivity) {
-	if _, ok := env.googleCalendar.registeredEvents[project.Title]; ok {
-		env.Logf(VerboseSimple, ColorCyan+"Module %v is already there\n", project.Title)
-		return
+func (env Environment) AddModule(module blueprint.CourseSummary, project blueprint.CourseActivity) error {
+	eventTitle := project.Title
+	if project.Title == "Project" {
+		eventTitle = fmt.Sprintf("[%v] %v", module.Title, project.Title)
+	}
+	if _, ok := env.googleCalendar.registeredEvents[eventTitle]; ok {
+		return errors.New(fmt.Sprintf("Project '%v' already registered", project.Title))
 	}
 	_, err := env.googleCalendar.service.Events.Insert(env.googleCalendar.internalCalendar.Id,
 		&calendar.Event{
@@ -285,12 +289,13 @@ func (env Environment) AddModule(module blueprint.CourseSummary, project bluepri
 				TimeZone: defaultTimeZone,
 			},
 			Status:       "confirmed",
-			Summary:      project.Title,
+			Summary:      eventTitle,
 			Transparency: "opaque",
-			Visibility:   "private",
+			Visibility:   "public",
 			Description:  fmt.Sprintf("Module: %v\n%v", module.Title, project.Description),
 		}).Do()
 	if err != nil {
 		log.Fatalf("Unable to insert an event: '%v'\n", err.Error())
 	}
+	return nil
 }

@@ -44,7 +44,7 @@ func setUpCommands(env *environment.Environment) {
 		Name:         "special-semester",
 		Description:  "(Optional) Register the semester 0 as a valid one. It will give more type.",
 	})
-	flag.SetHandlerToCmd("module-calendar", module.RegisterModuleToCalendar)
+	flag.SetHandlerToCmd("module-calendar", module.RegisterProjectToCalendar)
 	flag.SetUpPreHandler("module-calendar", func(e *environment.Environment) {
 		e.SetUpCalendar()
 	})

@@ -25,7 +25,7 @@ func GetCalendarDateFromString(strDate string) (time.Time, error) {
 
 func GetCESTDateFromString(strDate string) (time.Time, error) {
 	const layout = "2006-01-02 15:04:05 -0700 UTC"
-	strDate = strDate + " +0100 UTC"
+	strDate = strDate + " +0200 UTC"
 	if date, err := time.Parse(layout, strDate); err != nil {
 		return time.Time{}, err
 	} else {
@@ -48,7 +48,7 @@ func IsDateBeforeNow(date string) bool {
 
 func FullDateToRFC3339(strDate string) string {
 	const layout = "2006-01-02 15:04:05 -0700 UTC"
-	strDate = strDate + " +0100 UTC"
+	strDate = strDate + " +0200 UTC"
 	if date, err := time.Parse(layout, strDate); err != nil {
 		log.Fatal("Unable to parse a date.\n")
 		return ""

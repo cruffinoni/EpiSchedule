@@ -39,7 +39,10 @@ func RegisterUserToAnActivity(env environment.Environment, course blueprint.Cour
 			} else {
 				env.Errorf("Body: '%v'\n", string(body))
 			}
-			if env.GetVerboseLevel() == environment.VerboseDebug {
+			if res.StatusCode == 500 {
+				env.Log(environment.VerboseMedium, "			+ Forbidden. You can't register right now. Try to do it manually\n")
+			}
+			if env.GetVerboseLevel() != environment.VerboseDebug {
 				os.Exit(1)
 			}
 		} else {

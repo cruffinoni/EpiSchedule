@@ -74,7 +74,7 @@ func RegisterToModule(env environment.Environment) {
 	}
 }
 
-func RegisterModuleToCalendar(env environment.Environment) {
+func RegisterProjectToCalendar(env environment.Environment) {
 	//modulesToRegister := getModulesToRegister()
 	env.Log(environment.VerboseSimple, "Getting all courses, it can take some times...\n")
 	courseList, err := course.GetAllCourses(env)
@@ -83,12 +83,16 @@ func RegisterModuleToCalendar(env environment.Environment) {
 	}
 	env.Log(environment.VerboseSimple, "Registering modules to your calendar\n")
 	for _, c := range courseList {
+		if c.Details.StudentRegistered == 0 {
+			env.Logf(environment.VerboseDebug, "You are not registered to the module '%v', continuing...\n", c.Details.Title)
+			continue
+		}
 		if c.Summary.Status != "ongoing" {
 			dateFormatted, err := utils.GetCalendarDateFromString(c.Details.Begin)
 			if err != nil {
-				env.Logf(environment.VerboseSimple, environment.ColorBlue+"Module '%v' has not started yet and will begin at '%v'\n", c.Summary.Title, c.Details.Begin)
+				env.Logf(environment.VerboseSimple, environment.ColorYellow+"Module '%v' has not started yet and will begin at '%v'\n", c.Summary.Title, c.Details.Begin)
 			} else {
-				env.Logf(environment.VerboseSimple, environment.ColorBlue+"Module '%v' has not started yet and will begin at '%v'\n", c.Summary.Title, dateFormatted.Format(time.RFC822))
+				env.Logf(environment.VerboseSimple, environment.ColorYellow+"Module '%v' has not started yet and will begin at '%v'\n", c.Summary.Title, dateFormatted.Format(time.RFC822))
 			}
 			continue
 		}
@@ -96,11 +100,15 @@ func RegisterModuleToCalendar(env environment.Environment) {
 			env.Logf(environment.VerboseSimple, environment.ColorRed+"'%v' has no active project\n", c.Summary.Title)
 			continue
 		}
+		env.Logf(environment.VerboseSimple, environment.ColorBlue+"You are registered to '%v', checking activities...\n", c.Summary.Title)
 		for _, a := range c.Details.Activities {
 			if a.TypeTitle == "Project" || a.TypeTitle == "Mini-project" || a.TypeCode == "proj" {
-				env.Logf(environment.VerboseSimple, environment.ColorGreen+"Project '%v' added. It starts at %v and end at %v\n",
-					a.Title, a.Begin, a.End)
-				env.AddModule(c.Summary, a)
+				if err = env.AddModule(c.Summary, a); err != nil {
+					env.Logf(environment.VerboseSimple, environment.ColorRed+err.Error()+"\n")
+				} else {
+					env.Logf(environment.VerboseSimple, environment.ColorGreen+"	Project '%v' added. It starts at %v and end at %v\n",
+						a.Title, a.Begin, a.End)
+				}
 				break
 			}
 		}
